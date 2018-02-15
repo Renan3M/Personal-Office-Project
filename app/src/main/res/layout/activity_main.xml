@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#C1E1F9"
+    android:orientation="vertical">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="@android:color/darker_gray"
+        android:shrinkColumns="0,2"
+        android:stretchColumns="1"
+        android:weightSum="1">
+
+        <TableRow android:layout_weight="1">
+
+            <Button
+                android:id="@+id/btnTasks"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_column="0"
+                android:onClick="intentTasks"
+                android:text="Tarefas do dia" />
+
+            <Button
+                android:id="@+id/btnConfigs"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_column="1"
+                android:onClick="intentConfig"
+                android:text="Configurações" />
+
+            <Button
+                android:id="@+id/btnSocial"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_column="2"
+                android:onClick="intentSocial"
+                android:text="Rede Social" />
+        </TableRow>
+    </TableLayout>
+
+    <LinearLayout
+        android:id="@+id/activity_de_baixo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="3dp"
+        android:orientation="horizontal"
+        android:padding="3dp"
+        android:weightSum="5">
+
+
+        <ListView
+            android:id="@+id/lista_de_tarefas_do_dia"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:divider="@null"
+            android:dividerHeight="3dp">
+
+        </ListView>
+
+        <FrameLayout
+            android:id="@+id/tarefa"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+        </FrameLayout>
+
+        <ListView
+            android:id="@+id/lista_de_pomodoros"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:background="@android:color/transparent"
+            android:divider="@null"
+            android:dividerHeight="5dp"
+            android:listSelector="@android:color/transparent"
+            android:scrollbars="vertical" />
+    </LinearLayout>
+
+</LinearLayout>

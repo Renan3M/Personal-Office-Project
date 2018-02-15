@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1059501270757",
+    "firebase_url": "https://personaloffice-88596.firebaseio.com",
+    "project_id": "personaloffice-88596",
+    "storage_bucket": "personaloffice-88596.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1059501270757:android:f10f2f84a46f0023",
+        "android_client_info": {
+          "package_name": "com.personaltools.renan3m.personaloffice"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1059501270757-iokmclfsjoktmf71kt76n8jkgjq369ei.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.personaltools.renan3m.personaloffice",
+            "certificate_hash": "7eedb54d50218ad28fc1dac25e49649280184d3f"
+          }
+        },
+        {
+          "client_id": "1059501270757-cqgsitl716qpikefq66bkeik3ep1ulj3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWCroiEqwsPxJLGwo_RDtIMThPzFzVrlw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1059501270757-cqgsitl716qpikefq66bkeik3ep1ulj3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

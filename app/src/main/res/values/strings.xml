@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">Personal office</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="auth_failed">Autenticação falhou</string>
+    <string name="facebook_app_id">171135990314744</string>
+    <string name="fb_login_protocol_scheme">fb171135990314744</string>
+    <string name="facebook_login_text">LOGIN</string>
+    <string name="facebook_logout_text">LOGOUT</string>
+    <string name="task_name">Nome da tarefa:</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="initial_instructions_text_en"> Before using this app for the first time, please consider reading this brief
+    instruction. As you are quite aware, this app is made for self-organization purposes. \n\nThere are three buttons above, the
+    first one \"Daily task\" is where you set your tasks for the day and the pomodors they will take to be accomplished, if you
+    don\'t it will re-use your last task sequence defined by you. \n\nThe second button \"configs\" is where you set the time of each
+    interval and others prefs configurations. \n\nThe last one is not yet available as I'm working on it right now, so please be
+    patient and enjoy all the others functionalities I am freely giving to you, for improving you focus on your tasks. </string>
+
+    <string name="initial_instructions_text_pt"> Antes de utilizar este app pela primeira vez, por favor considere ler essa breve
+    instrução. Como você está completamente ciente, este app é feito para finalidades da auto-organização. \n\n Existem três botões
+    acima, o primeiro \"Tarefa do dia\" é onde você definir suas tarefas para o dia e os pomodoros que elas vão precisar para serem
+    realizadas, se você não defini-las elas vão re-usar a sua última seqüência de tarefas que você definiu. \n\nO segundo botão
+    \"configurações\" é onde você define a hora de cada intervalo e outros configurações de sua preferencia. \n\nO último ainda não está
+    disponível e eu estou trabalhando nisso agora, por favor, seja paciente e desfrute de todas as outras funcionalidades que eu
+    estou dando livremente para você, para melhorar sua produtividade em suas tarefas. </string>
+
+    <string name="motivational_quote"> Vou substituir a instruction (que será mostrada uma unica vez) para essa string que carregará
+    um frase motivacional sempre que o usuario abrir o app, como farei isso? json talvez? cuido disso no futuro. </string>
+</resources>
