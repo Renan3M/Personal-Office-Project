@@ -31,6 +31,7 @@ public class MyNotificationService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+
         synchronized (this) {
 
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -38,19 +39,15 @@ public class MyNotificationService extends IntentService {
             int time = intent.getIntExtra("time",0);
 
             Intent mIntent = new Intent(this, MainActivity.class);
-            mIntent.putExtra(MainActivity.CURRENT_TASK_FLAG,time);
-            intent.setAction("foo");
 
         builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ship_icon)
                 .setAutoCancel(true)
                 .setOngoing(true)
-                .setContentTitle("Time remaining for your pomodor")
-                .setContentIntent(
-                        PendingIntent.getActivity(this, 0, mIntent,PendingIntent.FLAG_UPDATE_CURRENT));
+                .setContentTitle("Time remaining for your pomodor");
 
 
-            while (time < TIMER_RUNTIME) {
+            while (time < TIMER_RUNTIME && !CurrentTask.stopService) {
                 try {
                     this.wait(1000);
                 } catch (InterruptedException e) {
@@ -69,14 +66,22 @@ public class MyNotificationService extends IntentService {
                 builder.setContentText(String.valueOf((TIMER_RUNTIME - time) / 60000 + " : "
                         + timePassedPlus / 1000 ));
 
+                mIntent.putExtra(MainActivity.CURRENT_TASK_FLAG,time);
+                intent.setAction("foo");
+
+                builder.setContentIntent(
+                        PendingIntent.getActivity(this, 0, mIntent,PendingIntent.FLAG_UPDATE_CURRENT));
+
+
                 mNotificationManager.notify(1, builder.build());
 
             }
 
-            builder.setContentTitle("Pomodoro finished").setContentText("Go back to work!");
+            if (!CurrentTask.stopService) {
+                builder.setContentTitle("Pomodoro finished").setContentText("Go back to work!");
 
-            mNotificationManager.notify(1,builder.build());
-
+                mNotificationManager.notify(1, builder.build());
+            } else mNotificationManager.cancel(1);
         }
     }
 }

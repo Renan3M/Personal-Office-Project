@@ -51,7 +51,8 @@
             android:screenOrientation="portrait" />
         <activity android:name=".Activities.DailyTask" />
 
-        <service android:name=".Notification.MyNotificationService">
+        <service
+            android:name=".Notification.MyNotificationService">
 
         <intent-filter>
             <action android:name="MY_NOTIFICATION_SERVICE" />

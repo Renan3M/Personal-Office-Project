@@ -65,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
     public Handler mHandler;
 
     private int oldCount = CurrentTask.taskCount;
+    private int timeService;
+
 
     @Override
     protected void onStart() {
@@ -112,7 +114,9 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
                 NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                 mNotificationManager.cancel(1);
 
-                Log.e(TAG,"O tempo passado é " + String.valueOf(getIntent().getExtras().getInt(CURRENT_TASK_FLAG,0)));
+                timeService = getIntent().getExtras().getInt(CURRENT_TASK_FLAG,0);
+
+                // AGORA SIM TÁ FUNCIONANDO!! Tenho que passar esse tempo pro contador (talvez com o if que coloque esse time no lugar do time de lá)
             }
 
             list = DailyTask.getListFromShared(getApplicationContext(),LIST_TAG);
@@ -185,6 +189,11 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
         }
     }
 
+    public int getTimeService() {
+        return timeService;
+    }
+
+
     private class MyCustomAdapter extends BaseAdapter {
 
         private ArrayList mData = new ArrayList();
@@ -241,8 +250,6 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
 public static class ViewHolder {
     public ImageView imageView;
 }
-
-
 
     public void intentTasks(View view) {
         startActivity(new Intent(this, DailyTask.class));

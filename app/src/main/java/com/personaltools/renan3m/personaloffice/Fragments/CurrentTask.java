@@ -23,6 +23,8 @@ import com.personaltools.renan3m.personaloffice.Widgets.PomtimeWidget;
 
 import java.util.ArrayList;
 
+import static java.lang.Thread.sleep;
+
 public class CurrentTask extends Fragment {
 
     //protected static final int TIMER_RUNTIME = 1500000; // 25 min
@@ -57,7 +59,9 @@ public class CurrentTask extends Fragment {
 
     private ArrayList<DailyTask.IndividualTask> list;
 
+    public static boolean stopService;
     private boolean startService;
+    private int timeService;
 
     public CurrentTask() {
         // Required empty public constructor
@@ -75,6 +79,8 @@ public class CurrentTask extends Fragment {
 
         taskName = view.findViewById(R.id.current_task_name_txt);
         taskName.setText(list.get(0).getNameTask());
+
+        intent = new Intent(getActivity(),MyNotificationService.class);
 
         txtTime = view.findViewById(R.id.time_txt_plzfindme);
 
@@ -94,18 +100,15 @@ public class CurrentTask extends Fragment {
 
         startService = false;
 
+
+
         btnTurnOff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                    startService = true;
-
-                    Log.e(TAG,"service ready to start, waiting for thread to pass the current time count");
-
             }
         });
 
-        intent = new Intent(getActivity(),MyNotificationService.class);
 
 
         uiHandler = new Handler(Looper.getMainLooper()) {
@@ -162,7 +165,7 @@ public class CurrentTask extends Fragment {
             public void run() {
                 synchronized (this) {
                     mActivity = true;
-                    int waited = 0;
+                    int waited = timeService;
 
                     try {
                         while (mActivity && (waited < TIMER_RUNTIME)) {
@@ -183,6 +186,7 @@ public class CurrentTask extends Fragment {
                     } catch (InterruptedException e) {
                         Log.e(TAG, e.getLocalizedMessage());
                     } finally {
+                        timeService = 0;
                         resetProgress();
                         onContinue(waited);
                     }
@@ -200,6 +204,7 @@ public class CurrentTask extends Fragment {
         btnReseted = true; // Da permissão para iniciar a proxima thread e mudar o texto no botão p/ STOP
 
         if (waited != TIMER_RUNTIME) return; // Thread interrompida
+
 
         list.get(0).decreasePom();
         Log.e(TAG, "decrementado");
@@ -225,7 +230,11 @@ public class CurrentTask extends Fragment {
         if (mListener != null) {
             Message msg = new Message();
             msg.what = MainActivity.HANDLER_UPDATE_POMODOR_LIST;
-            ((MainActivity) mListener).mHandler.sendMessage(msg); // why mListener = null?
+            ((MainActivity) mListener).mHandler.sendMessage(msg);
+            // A cofiguração da activity foi alterada, a thread antiga já não tem mais acesso à MainActivity que a iniciou originalmente (esta foi reiniciada / destruida);
+            // Isso é pessima prática, manter o serviço rodando quando já nem tem mais atividade para ele enviar resposta. (Memória)
+
+            // PRECISO DAR UMA ARRUMADA NISSO !!!  (Só estou escrevendo o comentário aqui porque foi aqui que estorou o erro)
         }
 
     }
@@ -236,6 +245,24 @@ public class CurrentTask extends Fragment {
             pomtimeWidget.setProgress(progress);
 
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        stopService = false;
+        startService = true;
+        Log.e(TAG,"service ready to start, waiting for thread to pass the current time count");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        stopService = true;
+
+        Intent intent = new Intent(getActivity(),MyNotificationService.class);
+        getActivity().stopService(intent); // Ta dando erro no logCat, da uma olhada!
     }
 
     private void resetProgress() {
@@ -254,6 +281,8 @@ public class CurrentTask extends Fragment {
             mListener = (MainActivity) context;
 
             list = ((MainActivity) mListener).getList();
+
+            timeService = ((MainActivity) mListener).getTimeService();
 
             if (list == null){Log.e(TAG,"ERROR, LISTA É NULA!");}
         } else {
