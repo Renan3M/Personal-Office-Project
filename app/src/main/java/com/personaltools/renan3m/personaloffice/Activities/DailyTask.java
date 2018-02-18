@@ -48,7 +48,7 @@ import java.util.List;
 public class DailyTask extends AppCompatActivity {
 
     private static SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editor;
+    private static SharedPreferences.Editor editor;
 
     private static final int SHOW_CONFIRMATION_DIALOG = 1;
 
@@ -184,13 +184,14 @@ public class DailyTask extends AppCompatActivity {
         return productFromShared;
     }
 
-    private <T> void setListToShared(String key, List<T> list){
+    public static <T> void setListToShared(String key, List<T> list){
         Gson gson = new Gson();
         String json = gson.toJson(list);
 
         editor.putString(key,json);
         editor.commit();
     }
+
 
     private AlertDialog criaDialogConfirmacao() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

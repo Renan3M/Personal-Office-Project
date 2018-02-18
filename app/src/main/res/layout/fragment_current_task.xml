@@ -1,47 +1,52 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_horizontal | center_vertical">
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/current_task_name_txt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:text="Laurem ipsum"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <TextView
         android:id="@+id/time_txt_plzfindme"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0" />
-
-    <com.personaltools.renan3m.personaloffice.Widgets.PomtimeWidget xmlns:android="http://schemas.android.com/apk/res/android"
-
-        android:id="@+id/pomtime_widget"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="260dp"
-        android:layout_centerInParent="false"
-        android:indeterminate="false"
-        android:max="100"
-        android:progress="0"
-        android:progressDrawable="@drawable/circular"
-        android:secondaryProgress="100" />
-
-    <Button
-        android:id="@+id/turn_off_screen_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:text="TURN OFF SCREEN" />
+        android:text="0"
+        android:textAlignment="center" />
 
-    <Button
-        android:id="@+id/restart_btn"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="STOP" />
+        android:layout_height="match_parent"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="vertical">
+
+        <com.personaltools.renan3m.personaloffice.Widgets.PomtimeWidget
+
+            android:id="@+id/pomtime_widget"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="260dp"
+            android:layout_centerInParent="false"
+            android:indeterminate="false"
+            android:max="100"
+            android:progress="0"
+            android:progressDrawable="@drawable/circular"
+            android:secondaryProgress="100"
+            custom:innerRatius="@integer/innerRatius" />
+
+        <Button
+            android:id="@+id/restart_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="STOP" />
+    </LinearLayout>
 
 </LinearLayout>

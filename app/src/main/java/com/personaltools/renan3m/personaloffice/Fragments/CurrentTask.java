@@ -1,17 +1,25 @@
 package com.personaltools.renan3m.personaloffice.Fragments;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.PowerManager;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.PermissionChecker;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -21,15 +29,20 @@ import com.personaltools.renan3m.personaloffice.Notification.MyNotificationServi
 import com.personaltools.renan3m.personaloffice.R;
 import com.personaltools.renan3m.personaloffice.Widgets.PomtimeWidget;
 
+import java.lang.reflect.Method;
+import java.security.Permission;
 import java.util.ArrayList;
 
+import static android.os.PowerManager.SCREEN_DIM_WAKE_LOCK;
 import static java.lang.Thread.sleep;
 
 public class CurrentTask extends Fragment {
 
-    //protected static final int TIMER_RUNTIME = 1500000; // 25 min
+  //  public static final int TIMER_RUNTIME = 1500000; // 25 min
 
-    public static final int TIMER_RUNTIME = 60000;  // (debug)
+    public static final int TIMER_RUNTIME = 60000; // 1 min
+
+
     private static final int UPDATE_TIMER = 0;
     private static final int RESET_TIMER = 1;
     private static final int RESET_BTN = 2;
@@ -37,12 +50,12 @@ public class CurrentTask extends Fragment {
 
     public static int taskCount = 0;
 
+
     private OnTaskInteraction mListener;
     private TextView taskName;
     private TextView txtTime;
 
     private Button btnRestart;
-    private Button btnTurnOff;
 
     private PomtimeWidget pomtimeWidget;
     private Intent intent;
@@ -74,6 +87,7 @@ public class CurrentTask extends Fragment {
 
         taskCount = 0;
 
+
         view = inflater.inflate(R.layout.fragment_current_task, container, false);
         // Inflate the layout for this fragment
 
@@ -96,19 +110,8 @@ public class CurrentTask extends Fragment {
             }
         });
 
-        btnTurnOff = view.findViewById(R.id.turn_off_screen_btn);
 
         startService = false;
-
-
-
-        btnTurnOff.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
 
 
         uiHandler = new Handler(Looper.getMainLooper()) {
@@ -136,7 +139,7 @@ public class CurrentTask extends Fragment {
                                 getActivity().startService(intent);
 
                                 startService = false;
-
+                                
                             }
 
 
@@ -196,8 +199,39 @@ public class CurrentTask extends Fragment {
         timerThread.setPriority(Thread.MIN_PRIORITY);
         timerThread.start();
 
+        mPowerManager = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
+
+        int flags = WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
+
+        getActivity().getWindow().addFlags(flags); // this is how your app will wake up the screen you will call this activity later
+
         return view;
     }
+
+    private PowerManager mPowerManager;
+    private PowerManager.WakeLock mWakeLock;
+
+    public void turnOnScreen(){
+        // turn on screen
+
+        //  mWakeLock = mPowerManager.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "tag");  QUE INCRIVEL, VEJA!!
+        mWakeLock = mPowerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "tag");
+        mWakeLock.acquire();
+    }
+
+
+    public void turnOffScreen(){
+        // "Turn off screen"
+
+            WindowManager.LayoutParams lp = getActivity().getWindow().getAttributes();
+            lp.flags= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+            lp.dimAmount= 1;
+            getActivity().getWindow().setAttributes(lp);
+
+
+    }
+
 
     private void onContinue(int waited) {
 
@@ -231,12 +265,13 @@ public class CurrentTask extends Fragment {
             Message msg = new Message();
             msg.what = MainActivity.HANDLER_UPDATE_POMODOR_LIST;
             ((MainActivity) mListener).mHandler.sendMessage(msg);
-            // A cofiguração da activity foi alterada, a thread antiga já não tem mais acesso à MainActivity que a iniciou originalmente (esta foi reiniciada / destruida);
-            // Isso é pessima prática, manter o serviço rodando quando já nem tem mais atividade para ele enviar resposta. (Memória)
-
-            // PRECISO DAR UMA ARRUMADA NISSO !!!  (Só estou escrevendo o comentário aqui porque foi aqui que estorou o erro)
         }
 
+        updateToShared(list);
+    }
+
+    private void updateToShared(ArrayList<DailyTask.IndividualTask> list) {
+        DailyTask.setListToShared(MainActivity.LIST_TAG, list);
     }
 
     private void updateProgressBar(final int timePassed) {
@@ -259,10 +294,12 @@ public class CurrentTask extends Fragment {
     public void onStart() {
         super.onStart();
 
+        if (mPowerManager == null) mPowerManager = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
+
         stopService = true;
 
         Intent intent = new Intent(getActivity(),MyNotificationService.class);
-        getActivity().stopService(intent); // Ta dando erro no logCat, da uma olhada!
+        getActivity().stopService(intent);
     }
 
     private void resetProgress() {
@@ -299,7 +336,7 @@ public class CurrentTask extends Fragment {
 
 
     public void restartTimer(View view) {
-        //  timerThread.start(); // não da pra re-usar threads mané, tem q instanciar dnv!
+        //  timerThread.start(); // não da pra re-usar threads, tem q instanciar dnv!
 
         if (list.isEmpty()) return;
 

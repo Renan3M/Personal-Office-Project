@@ -3,6 +3,7 @@ package com.personaltools.renan3m.personaloffice.Activities;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
@@ -71,9 +72,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
     @Override
     protected void onStart() {
         super.onStart();
-        Log.e(TAG,"STAAAARTED");
+        Log.e(TAG, "STAAAARTED");
     }
-
 
 
     @Override
@@ -81,7 +81,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Log.e(TAG,"CREATED");
+        SharedPreferences sP = getApplicationContext().getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        Log.e(TAG, "CREATED");
 
         blankTask = new BlankTask();
         currentTask = new CurrentTask();
@@ -90,10 +91,10 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
         listOfTasks = findViewById(R.id.lista_de_tarefas_do_dia);
         listOfPomodors = findViewById(R.id.lista_de_pomodoros);
 
-        mHandler = new Handler(){
+        mHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                switch (msg.what){
+                switch (msg.what) {
                     case HANDLER_UPDATE_POMODOR_LIST:
 
                         refreshPomodorsList();
@@ -107,28 +108,32 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
             }
         };
 
+        if (DailyTask.getListFromShared(getApplicationContext(), LIST_TAG).isEmpty()) {
 
-        if (getIntent().hasExtra(CURRENT_TASK_FLAG)) {
-            if (getIntent().getExtras().getInt(CURRENT_TASK_FLAG) != 0)
-            {
+            getSupportFragmentManager().beginTransaction().add(R.id.tarefa, blankTask).commit();
+
+            return;
+
+        } else if (getIntent().hasExtra(CURRENT_TASK_FLAG) || sP.contains(LIST_TAG)) {
+            if (getIntent().getExtras().getInt(CURRENT_TASK_FLAG) != 0) {
                 NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                 mNotificationManager.cancel(1);
 
-                timeService = getIntent().getExtras().getInt(CURRENT_TASK_FLAG,0);
+                timeService = getIntent().getExtras().getInt(CURRENT_TASK_FLAG, 0);
 
-                // AGORA SIM TÁ FUNCIONANDO!! Tenho que passar esse tempo pro contador (talvez com o if que coloque esse time no lugar do time de lá)
             }
 
-            list = DailyTask.getListFromShared(getApplicationContext(),LIST_TAG);
+            list = DailyTask.getListFromShared(getApplicationContext(), LIST_TAG);
 
-            if (list == null){ Log.e(TAG,"Lista não sendo recuperada"); }
+            if (list == null) {
+                Log.e(TAG, "Lista não sendo recuperada");
+            }
 
-            getSupportFragmentManager().beginTransaction().replace(R.id.tarefa, currentTask).commit();
 
             ArrayList<String> valuesT = new ArrayList();
 
             for (int i = 0; i < list.size(); i++) {
-                valuesT.add("Tarefa " + (i + 1) + "\n(" + String.valueOf((list.get(i)).getNumDePom()) + ")");
+                valuesT.add("Tarefa " + (i + 1) );
             }
 
             listOfTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -139,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
             });
 
 
-            arrayAdapter = new ArrayAdapter<String>(this, R.layout.main_list_tasks, valuesT){
+            arrayAdapter = new ArrayAdapter<String>(this, R.layout.main_list_tasks, valuesT) {
 
                 @NonNull
                 @Override
@@ -147,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
                     TextView textView = (TextView) super.getView(position, convertView, parent);
 
 
-                    if (position == oldCount){
+                    if (position == oldCount) {
                         textView.setTextColor(Color.GRAY);
                         oldCount = CurrentTask.taskCount;
                     }
@@ -172,19 +177,23 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
             listOfPomodors.setAdapter(mAdapter);
 
 
+            getSupportFragmentManager().beginTransaction().replace(R.id.tarefa, currentTask).commit();
+
+            return;
 
         } else getSupportFragmentManager().beginTransaction().add(R.id.tarefa, blankTask).commit();
 
     }
 
 
-    public void refreshPomodorsList(){
+    public void refreshPomodorsList() {
         mAdapter.clear();
 
-        try{
-        for (int i = 0; i < list.get(0).getNumDePom() - 1; i++) {
-            mAdapter.addItem("item " + i);
-        }} catch (Exception ie){
+        try {
+            for (int i = 0; i < list.get(0).getNumDePom() - 1; i++) {
+                mAdapter.addItem("item " + i);
+            }
+        } catch (Exception ie) {
             // Nothing to worry about
         }
     }
@@ -199,8 +208,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
         private ArrayList mData = new ArrayList();
         private LayoutInflater mInflater;
 
-        public MyCustomAdapter (){
-            mInflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        public MyCustomAdapter() {
+            mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
         public void addItem(final String item) {
@@ -208,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
             notifyDataSetChanged();
         }
 
-        public void clear(){
+        public void clear() {
             mData.clear();
             notifyDataSetChanged();
         }
@@ -234,22 +243,22 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
             ViewHolder holder = null;
 
             if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.main_list_pom, null);
-            holder = new ViewHolder();
-            holder.imageView = convertView.findViewById(R.id.pomodor);
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder)convertView.getTag();
-        }
+                convertView = mInflater.inflate(R.layout.main_list_pom, null);
+                holder = new ViewHolder();
+                holder.imageView = convertView.findViewById(R.id.pomodor);
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
 
             return convertView;
+        }
+
     }
 
-}
-
-public static class ViewHolder {
-    public ImageView imageView;
-}
+    public static class ViewHolder {
+        public ImageView imageView;
+    }
 
     public void intentTasks(View view) {
         startActivity(new Intent(this, DailyTask.class));
@@ -257,10 +266,21 @@ public static class ViewHolder {
 
     public void intentConfig(View view) {
     }
+
     public void intentSocial(View view) {
     }
 
-    public ArrayList<DailyTask.IndividualTask> getList(){
+    public ArrayList<DailyTask.IndividualTask> getList() {
         return list;
+    }
+
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            finishAffinity();
+        } else android.os.Process.killProcess(android.os.Process.myPid());
     }
 }
