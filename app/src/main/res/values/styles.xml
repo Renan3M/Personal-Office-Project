@@ -8,4 +8,13 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+<!-- <style name="Widget.Button.Oval">
+        <item name="background">@drawable/oval_btn</item>
+        <item name="focusable">true</item>
+        <item name="clickable">true</item>
+        <item name="textAppearance">?attr/textAppearanceSmallInverse</item>
+        <item name="textColor">@color/primary_text_light</item>
+        <item name="gravity">center_vertical|center_horizontal</item>
+    </style>-->
+
 </resources>

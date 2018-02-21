@@ -39,12 +39,13 @@ public class MyNotificationService extends IntentService {
             int time = intent.getIntExtra("time",0);
 
             Intent mIntent = new Intent(this, MainActivity.class);
+            mIntent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
 
         builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ship_icon)
                 .setAutoCancel(true)
                 .setOngoing(true)
-                .setContentTitle("Time remaining for your pomodor");
+                .setContentTitle("Pomodoro time left...");
 
 
             while (time < TIMER_RUNTIME && !CurrentTask.stopService) {
@@ -67,7 +68,7 @@ public class MyNotificationService extends IntentService {
                         + timePassedPlus / 1000 ));
 
                 mIntent.putExtra(MainActivity.CURRENT_TASK_FLAG,time);
-                intent.setAction("foo");
+                mIntent.setAction("foo");
 
                 builder.setContentIntent(
                         PendingIntent.getActivity(this, 0, mIntent,PendingIntent.FLAG_UPDATE_CURRENT));

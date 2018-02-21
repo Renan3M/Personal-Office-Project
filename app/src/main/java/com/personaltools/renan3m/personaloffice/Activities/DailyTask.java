@@ -48,7 +48,7 @@ import java.util.List;
 public class DailyTask extends AppCompatActivity {
 
     private static SharedPreferences sharedPreferences;
-    private static SharedPreferences.Editor editor;
+    private  SharedPreferences.Editor editor;
 
     private static final int SHOW_CONFIRMATION_DIALOG = 1;
 
@@ -184,7 +184,8 @@ public class DailyTask extends AppCompatActivity {
         return productFromShared;
     }
 
-    public static <T> void setListToShared(String key, List<T> list){
+    public <T> void setListToShared(String key, List<T> list){
+
         Gson gson = new Gson();
         String json = gson.toJson(list);
 
@@ -206,6 +207,8 @@ public class DailyTask extends AppCompatActivity {
                             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
 
                             intent.putExtra(MainActivity.CURRENT_TASK_FLAG, "");
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                             startActivity(intent);
 

@@ -63,16 +63,6 @@ public class PomtimeWidget extends ProgressBar {
 
     private void init (@Nullable AttributeSet set){ // tenho q decodificar esse set (apesar de ainda n ter nenhum atributo)
 
-        // AQUI ESTÃO MEUS ATRIBUTOS, TENHO Q ARMAZENAR O INNERRADIUS EM UM ATRIBUTO, PARA NO MÉTODO ONSIZECHANGE EU ALTERA-LO
-        // PARA QUE CAIBA NA TELA DA VIEW.
-
-        // AQUI EU SÓ POSSO RECUPERAR O QUE ELE JÁ SETOU?
-
-
-        // Como mudar o innerRadius do nosso widget para receber esses novos parametros?
-        getResources().getInteger(R.integer.innerRatius);
-
-
         paintBit = new Paint(Paint.ANTI_ALIAS_FLAG);
 
         appleImg = BitmapFactory.decodeResource(getResources(),R.drawable.pomtime_img);
@@ -109,7 +99,7 @@ public class PomtimeWidget extends ProgressBar {
     // Quero ter um ImageView e um ProgressBar. desenhando primeiro o ProgressBar e depois o imageView no centro dele.
     @Override
     protected void onDraw(Canvas canvas) {
-     //   setRInteger(com.personaltools.renan3m.personaloffice.R.class,"innerRatius", new Integer(9));   Que diabos!
+     //   setRInteger(com.personaltools.renan3m.personaloffice.R.class,"innerRatius", new Integer(9));   Que diabos!  Solução: Devia usar innerRatiusRatio em vez disso, pois este substitui o innerRatius.
         super.onDraw(canvas); // Isso desenha a ProgressBar
 
         appleImg = getResizedBitmap(appleImg,(getWidth()) - getPaddingLeft() +
@@ -131,23 +121,26 @@ public class PomtimeWidget extends ProgressBar {
 
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
+    protected synchronized void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-
-        // Account for padding
         float xpad = (float)(getPaddingLeft() + getPaddingRight());
         float ypad = (float)(getPaddingTop() + getPaddingBottom());
 
+        // Try for a width based on our minimum
+        float ww = (float)widthMeasureSpec - xpad;
+        float hh = (float)heightMeasureSpec - ypad;
 
-        float ww = (float)w - xpad; // novo width - padding
-        float hh = (float)h - ypad; // novo height - padding
+        // Figure out how big we can make the pie.
+        float size = Math.min(ww, hh);
 
-        Log.e("PomtimeWidget", "onSizeChanged called");
-
-
-
+        setMeasuredDimension((int)size, (int)size);
     }
+
+
+    /* Useful for changing a field from a resource by using reflection, tried to change de innerRatiusRadio in order to replace the
+    old value with a new one depending on the device witch is processing the view, but not necessary for this class.
+
     public static void setRInteger(Class rClass, String rFieldName, Object newValue){
         setR(rClass,"integer",rFieldName,newValue);
     }
@@ -175,5 +168,5 @@ public class PomtimeWidget extends ProgressBar {
             e.printStackTrace();
             return false;
         }
-    }
+    }*/
 }

@@ -32,20 +32,20 @@
             android:id="@+id/pomtime_widget"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="260dp"
+            android:layout_height="match_parent"
             android:layout_centerInParent="false"
             android:indeterminate="false"
             android:max="100"
             android:progress="0"
             android:progressDrawable="@drawable/circular"
-            android:secondaryProgress="100"
-            custom:innerRatius="@integer/innerRatius" />
+            android:secondaryProgress="100" />
 
         <Button
             android:id="@+id/restart_btn"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:background="@drawable/oval_btn"
             android:text="STOP" />
     </LinearLayout>
 

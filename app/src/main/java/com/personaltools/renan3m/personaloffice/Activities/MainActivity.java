@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IllegalFormatCodePointException;
 import java.util.List;
 import java.util.Objects;
 
@@ -79,6 +80,9 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0){finish(); return;}
+
         setContentView(R.layout.activity_main);
 
         SharedPreferences sP = getApplicationContext().getSharedPreferences(MainActivity.PREFS_NAME, 0);
@@ -131,20 +135,23 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
 
 
             ArrayList<String> valuesT = new ArrayList();
-
+            try {
             for (int i = 0; i < list.size(); i++) {
-                valuesT.add("Tarefa " + (i + 1) );
-            }
+                valuesT.add("Tarefa " + (i + 1) + "\n(" +list.get(i).getNumDePom() +")");
+            }}catch (IndexOutOfBoundsException e){}
 
             listOfTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
-                    Toast.makeText(getApplicationContext(), list.get(i).getNameTask(), Toast.LENGTH_SHORT).show();
+                    // Como atualizar a lista de tasks sem remove-las que nem com a lista de pomodoros?
+                    // Pois eu não estou dando refresh nessa sub-lista justamente para evitar remoção de tarefas da listview.
+
+                    Toast.makeText(getApplicationContext(), list.get(i - CurrentTask.taskCount).getNameTask(), Toast.LENGTH_SHORT).show();
                 }
             });
 
 
-            arrayAdapter = new ArrayAdapter<String>(this, R.layout.main_list_tasks, valuesT) {
+            arrayAdapter = new ArrayAdapter<String>(this, R.layout.main_list_tasks, valuesT) { // valuesT n muda
 
                 @NonNull
                 @Override
@@ -170,9 +177,10 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
 
             mAdapter = new MyCustomAdapter();
 
+            try{
             for (int i = 0; i < list.get(0).getNumDePom() - 1; i++) {
                 mAdapter.addItem("item " + i);
-            }
+            }}catch (IndexOutOfBoundsException e){}
 
             listOfPomodors.setAdapter(mAdapter);
 
@@ -188,8 +196,9 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
 
     public void refreshPomodorsList() {
         mAdapter.clear();
-
-        try {
+        Log.e(TAG,"refreshed called for pomodors"); // could use a counter and add to the onItemClick of listOfTasks for each
+                                                         // refresh, this way I simulate a refresh to the tasks, not needing to
+        try {                                            // change their values (valuesT). Or can get the taskCount from current
             for (int i = 0; i < list.get(0).getNumDePom() - 1; i++) {
                 mAdapter.addItem("item " + i);
             }
@@ -267,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
     public void intentConfig(View view) {
     }
 
-    public void intentSocial(View view) {
+    public void intentHist(View view) {
     }
 
     public ArrayList<DailyTask.IndividualTask> getList() {
@@ -278,9 +287,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            finishAffinity();
-        } else android.os.Process.killProcess(android.os.Process.myPid());
+        // Does not finish the activity, but simply move it to the back. (not always work, should find out why)
+        moveTaskToBack(true);
     }
 }

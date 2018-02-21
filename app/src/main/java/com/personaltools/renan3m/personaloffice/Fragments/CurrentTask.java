@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.personaltools.renan3m.personaloffice.Activities.DailyTask;
+import com.personaltools.renan3m.personaloffice.Activities.Historical;
 import com.personaltools.renan3m.personaloffice.Activities.MainActivity;
 import com.personaltools.renan3m.personaloffice.Notification.MyNotificationService;
 import com.personaltools.renan3m.personaloffice.R;
@@ -48,7 +49,7 @@ public class CurrentTask extends Fragment {
     private static final int RESET_BTN = 2;
     private final String TAG = "CurrentTask";
 
-    public static int taskCount = 0;
+    public static int taskCount;
 
 
     private OnTaskInteraction mListener;
@@ -85,11 +86,12 @@ public class CurrentTask extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        taskCount = 0;
-
+        if (timeService == 0){ taskCount = 0;}
 
         view = inflater.inflate(R.layout.fragment_current_task, container, false);
         // Inflate the layout for this fragment
+
+        Log.e(TAG,"Notification created this again, idk why...");
 
         taskName = view.findViewById(R.id.current_task_name_txt);
         taskName.setText(list.get(0).getNameTask());
@@ -150,8 +152,8 @@ public class CurrentTask extends Fragment {
                         break;
 
                     case RESET_TIMER:
-
                         txtTime.setText(String.valueOf("(" + TIMER_RUNTIME / 60000 + " : " + 00 + ")"));
+                        if (list.size() != 0) taskName.setText(list.get(0).getNameTask());
                         break;
 
                     case RESET_BTN:
@@ -199,7 +201,7 @@ public class CurrentTask extends Fragment {
         timerThread.setPriority(Thread.MIN_PRIORITY);
         timerThread.start();
 
-        mPowerManager = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
+    //    mPowerManager = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
 
         int flags = WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
                 WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
@@ -208,6 +210,8 @@ public class CurrentTask extends Fragment {
 
         return view;
     }
+
+/* Tryed to make an turn off mechanism, failed at trying this, wouldn't turn off the damn screen.
 
     private PowerManager mPowerManager;
     private PowerManager.WakeLock mWakeLock;
@@ -231,7 +235,7 @@ public class CurrentTask extends Fragment {
 
 
     }
-
+*/
 
     private void onContinue(int waited) {
 
@@ -248,7 +252,7 @@ public class CurrentTask extends Fragment {
         uiHandler.sendMessage(message);
 
         if (list.get(0).getNumDePom() == 0) {
-            list.remove(0);
+            list.remove(0);              // list é decrementada, quem era index 1 agora é index 0.
 
             taskCount++;
             Log.e(TAG, "removido");
@@ -267,12 +271,13 @@ public class CurrentTask extends Fragment {
             ((MainActivity) mListener).mHandler.sendMessage(msg);
         }
 
-        updateToShared(list);
+        if (list.isEmpty()) {  // Como vou enviar essa lista para Historical se a lista tá vazia? e.e ... já sei!
+            Intent intent = new Intent(getActivity(), Historical.class);
+            intent.putExtra("list", ((MainActivity) mListener).getList());
+        }
     }
 
-    private void updateToShared(ArrayList<DailyTask.IndividualTask> list) {
-        DailyTask.setListToShared(MainActivity.LIST_TAG, list);
-    }
+
 
     private void updateProgressBar(final int timePassed) {
         if (null != pomtimeWidget) {
@@ -294,7 +299,12 @@ public class CurrentTask extends Fragment {
     public void onStart() {
         super.onStart();
 
-        if (mPowerManager == null) mPowerManager = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
+        Log.e(TAG,"Notification may have started this");
+
+    //    if (mPowerManager == null) mPowerManager = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
+
+        if (timeService != 0 && txtTime != null) txtTime.setText("(" + String.valueOf((TIMER_RUNTIME - timeService)
+                / 60000 + " : " + timePassedPlus / 1000 + ")"));
 
         stopService = true;
 
