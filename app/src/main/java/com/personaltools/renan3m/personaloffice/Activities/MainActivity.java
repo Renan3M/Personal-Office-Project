@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
     public static final int HANDLER_UPDATE_TASK_LIST = 1;
     public static final String CURRENT_TASK_FLAG = "Current_task_flag";
     public static final String LIST_TAG = "list";
+    public static final String LIST_OF_LISTS_TAG = "list_of_lists"; // So ugly, jesus..
 
 
     private BlankTask blankTask;
@@ -119,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
             return;
 
         } else if (getIntent().hasExtra(CURRENT_TASK_FLAG) || sP.contains(LIST_TAG)) {
+            CurrentTask.taskCount = 0;
             if (getIntent().getExtras().getInt(CURRENT_TASK_FLAG) != 0) {
                 NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                 mNotificationManager.cancel(1);
@@ -128,6 +130,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
             }
 
             list = DailyTask.getListFromShared(getApplicationContext(), LIST_TAG);
+            // O Reset na list só acontence quando vc sobrescreve ela no dailyTask com uma nova lista, mas smp q iniciar essa atividade
+            // ele vai pegar o ultimo valor do sharedPreferences.
 
             if (list == null) {
                 Log.e(TAG, "Lista não sendo recuperada");
@@ -277,6 +281,9 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
     }
 
     public void intentHist(View view) {
+        Intent intent = new Intent(this, Historical.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
     public ArrayList<DailyTask.IndividualTask> getList() {

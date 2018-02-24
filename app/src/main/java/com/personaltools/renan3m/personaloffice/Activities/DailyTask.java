@@ -12,6 +12,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.ArraySet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,10 +33,12 @@ import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-
-
+import java.lang.String;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 // A grande gambiara nessa activity é porque eu só adiciono os Individual tasks na listOfTasks (que são enviados na intent pra
@@ -47,10 +50,14 @@ import java.util.List;
 
 public class DailyTask extends AppCompatActivity {
 
+    private static final String TAG = "DailyTask";
     private static SharedPreferences sharedPreferences;
-    private  SharedPreferences.Editor editor;
+    private static SharedPreferences.Editor editor;
+    private static Type type = new TypeToken<ArrayList<IndividualTask>>() {}.getType();
 
     private static final int SHOW_CONFIRMATION_DIALOG = 1;
+
+    private static Set<String> listOfLists;
 
     private AlertDialog dialogConfirmacao;
 
@@ -74,6 +81,7 @@ public class DailyTask extends AppCompatActivity {
 
         private int numDePom;
         private String nameTask;
+        private String insertedTime;
 
         public IndividualTask(int numDePom, String nameTask) {
             this.numDePom = numDePom;
@@ -85,6 +93,7 @@ public class DailyTask extends AppCompatActivity {
         protected IndividualTask(Parcel in) {
             numDePom = in.readInt();
             nameTask = in.readString();
+            insertedTime = in.readString();
         }
 
 
@@ -109,6 +118,7 @@ public class DailyTask extends AppCompatActivity {
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeInt(numDePom);
             dest.writeString(nameTask);
+            dest.writeString(insertedTime);
         }
 
         public void setNumDePom(int n){
@@ -130,6 +140,15 @@ public class DailyTask extends AppCompatActivity {
         public void decreasePom() {
             this.numDePom--;
         }
+
+        public String getInsertedTime() {
+            return insertedTime;
+        }
+
+        public void setInsertedTime(String insertedTime) {
+            this.insertedTime = insertedTime;
+        }
+
 
     }
 
@@ -175,22 +194,76 @@ public class DailyTask extends AppCompatActivity {
         Gson gson = new Gson();
         ArrayList<IndividualTask> productFromShared = new ArrayList<>();
 
-        if (sharedPreferences == null)  sharedPreferences = ctx.getSharedPreferences(MainActivity.PREFS_NAME,0);
-        String jsonPreferences = sharedPreferences.getString(key,""); // sharedPrefereces = null?
+        if (sharedPreferences == null) // Será q é necessário?
+                sharedPreferences = ctx.getSharedPreferences(MainActivity.PREFS_NAME,0);
 
-        Type type = new TypeToken<ArrayList<IndividualTask>>() {}.getType();
+        String jsonPreferences = sharedPreferences.getString(key,"");
+
         productFromShared = gson.fromJson(jsonPreferences,type);
 
         return productFromShared;
     }
 
-    public <T> void setListToShared(String key, List<T> list){
+    public static <T> void setListToShared(String key, List<T> list){
 
         Gson gson = new Gson();
         String json = gson.toJson(list);
 
         editor.putString(key,json);
         editor.commit();
+    }
+
+    public static <T> void setListToSharedSet(Context ctx, String setKey){ // Esse método deve ser chamado apenas qndo ja tiver terminado as tarefas todas da lista.
+
+        if (sharedPreferences == null) // Será q é necessário?
+                sharedPreferences = ctx.getSharedPreferences(MainActivity.PREFS_NAME,0);
+
+        // Adcionando o json (lista atual) ao nosso set. Esse set não está persistindo.. (dando reset)
+        String listOfTasks = sharedPreferences.getString(MainActivity.LIST_TAG,"");
+
+        if (listOfLists == null){listOfLists = new TreeSet<>(); }
+
+        if (!listOfTasks.equals("")) listOfLists.add(listOfTasks); // em Json
+
+        // Adcionando o set ao sharedPreferences
+        if (editor == null)
+                editor = sharedPreferences.edit();
+
+        if (sharedPreferences.getStringSet(setKey, null) == null) { // First time creating the shared
+            editor.putStringSet(setKey, listOfLists);
+            editor.commit();
+        } else {
+          Set<String> list = sharedPreferences.getStringSet(setKey,null);
+          list.addAll(listOfLists);
+
+            editor.putStringSet(setKey, list);
+            editor.commit();
+        }
+    }
+
+    public static ArrayList<ArrayList<IndividualTask>> getListsFromSharedSet(String setKey){
+
+        Set<String> set = sharedPreferences.getStringSet(setKey, null);
+
+        ArrayList<ArrayList<IndividualTask>> setOfLists = new ArrayList<>();
+
+        Gson gson = new Gson();
+
+        // Percorrendo o sharedSet e adcionando seu objeto json já convertido para o nosso array.
+
+        if (set == null){
+            Log.e(TAG,"Set = null, error!");
+            return null;
+        }
+
+        //Até aqui tudo ocorre que nem o desejado
+
+
+        for (String taskJson : set) {
+            setOfLists.add((ArrayList<IndividualTask>) gson.fromJson(taskJson,type));
+        }
+
+         return setOfLists;
     }
 
 
@@ -202,6 +275,13 @@ public class DailyTask extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int id) {
 
                         if (!listOfTasks.isEmpty()) {
+
+                            Date data = new Date();
+                            data.setTime(System.currentTimeMillis());
+
+                            // Já q n consigo armazenar no objeto lista..
+                            ((IndividualTask)listOfTasks.get(0)).setInsertedTime(data.toGMTString());
+
                             setListToShared(MainActivity.LIST_TAG,listOfTasks);
 
                             Intent intent = new Intent(getApplicationContext(), MainActivity.class);

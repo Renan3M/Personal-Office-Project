@@ -35,13 +35,14 @@ import java.security.Permission;
 import java.util.ArrayList;
 
 import static android.os.PowerManager.SCREEN_DIM_WAKE_LOCK;
+import static java.lang.Thread.MIN_PRIORITY;
 import static java.lang.Thread.sleep;
 
 public class CurrentTask extends Fragment {
 
   //  public static final int TIMER_RUNTIME = 1500000; // 25 min
 
-    public static final int TIMER_RUNTIME = 60000; // 1 min
+    public static final int TIMER_RUNTIME = 10000; // 1 min
 
 
     private static final int UPDATE_TIMER = 0;
@@ -172,6 +173,7 @@ public class CurrentTask extends Fragment {
                     mActivity = true;
                     int waited = timeService;
 
+
                     try {
                         while (mActivity && (waited < TIMER_RUNTIME)) {
                             sleep(1000);
@@ -199,7 +201,8 @@ public class CurrentTask extends Fragment {
             }
         };
         timerThread.setPriority(Thread.MIN_PRIORITY);
-        timerThread.start();
+
+        if (!list.isEmpty()) timerThread.start();
 
     //    mPowerManager = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
 
@@ -211,7 +214,7 @@ public class CurrentTask extends Fragment {
         return view;
     }
 
-/* Tryed to make an turn off mechanism, failed at trying this, wouldn't turn off the damn screen.
+/* Tried to make an turn off mechanism, failed at trying this, wouldn't turn off the screen.
 
     private PowerManager mPowerManager;
     private PowerManager.WakeLock mWakeLock;
@@ -271,9 +274,11 @@ public class CurrentTask extends Fragment {
             ((MainActivity) mListener).mHandler.sendMessage(msg);
         }
 
-        if (list.isEmpty()) {  // Como vou enviar essa lista para Historical se a lista tá vazia? e.e ... já sei!
-            Intent intent = new Intent(getActivity(), Historical.class);
-            intent.putExtra("list", ((MainActivity) mListener).getList());
+        // Aqui vou apenas salvar no sharedPreferences para lá acessar.
+        if (list.isEmpty()) {
+
+            DailyTask.setListToSharedSet(getActivity(),MainActivity.LIST_OF_LISTS_TAG); // Uma vez que a lista de tarefas acabou
+            DailyTask.setListToShared(MainActivity.LIST_TAG,new ArrayList<>()); // Reseta o sharedList
         }
     }
 
@@ -299,15 +304,15 @@ public class CurrentTask extends Fragment {
     public void onStart() {
         super.onStart();
 
-        Log.e(TAG,"Notification may have started this");
 
     //    if (mPowerManager == null) mPowerManager = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
 
         if (timeService != 0 && txtTime != null) txtTime.setText("(" + String.valueOf((TIMER_RUNTIME - timeService)
                 / 60000 + " : " + timePassedPlus / 1000 + ")"));
 
-        stopService = true;
+        stopService = true; // <-- Flag usada pelo serviço
 
+        // Parando a notificação
         Intent intent = new Intent(getActivity(),MyNotificationService.class);
         getActivity().stopService(intent);
     }
