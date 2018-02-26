@@ -14,6 +14,9 @@ import com.personaltools.renan3m.personaloffice.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import static com.personaltools.renan3m.personaloffice.Activities.DailyTask.getListFromShared;
@@ -22,8 +25,12 @@ public class Historical extends AppCompatActivity {
 
     private static final String TAG = "HistoricalActivity";
 
-    List<String> list;
-    ListView listView;
+    private  ArrayList<ArrayList<DailyTask.IndividualTask>> listOfLists;
+
+    private List<String> list;
+    private ListView listView;
+    private Date left;
+    private Date right;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,40 +39,44 @@ public class Historical extends AppCompatActivity {
 
         listView = findViewById(R.id.hist_list);
 
+        if (DailyTask.getListsFromSharedSet(MainActivity.LIST_OF_LISTS_TAG) == null) return;
+
+        left = new Date();
+        right = new Date();
+
         list = new ArrayList<>();
 
-        ArrayList<ArrayList<DailyTask.IndividualTask>> listOfLists =
-                DailyTask.getListsFromSharedSet(MainActivity.LIST_OF_LISTS_TAG);
+        listOfLists = DailyTask.getListsFromSharedSet(MainActivity.LIST_OF_LISTS_TAG);
 
-        Log.e(TAG, String.valueOf(listOfLists.size()));
+        // Sorteia nossa lista baseado em sua ordem de data de inserção.
+        Collections.sort(listOfLists, new Comparator<ArrayList<DailyTask.IndividualTask>>() {
+            @Override
+            public int compare(ArrayList<DailyTask.IndividualTask> left, ArrayList<DailyTask.IndividualTask> right) {
 
+                return left.get(0).getInsertedTime().compareTo(right.get(0).getInsertedTime());
+        }});
 
-        // tenho q adicionar 1 section para cada lista, e atribuir a data de inserção ao caption.
-
-
-        // Isso cria uma section para todas as listas de até agora
-
-        for (ArrayList<DailyTask.IndividualTask> listArray : listOfLists) {
+        // Percorre nossa lista de listas criando uma section para cada lista filha com seus respectivos elementos.
+        for (int a = 0; a < listOfLists.size(); a++) {
 
             list.clear();
 
-            for (int i = 0; i < listArray.size(); i++) {
-                Log.e(TAG, listArray.get(i).getNameTask());
+            for (int i = 0; i < listOfLists.get(a).size(); i++) {
+                Log.e(TAG, listOfLists.get(a).get(i).getNameTask());
 
-                String content = listArray.get(i).getNameTask() + " - " +
-                        String.valueOf(listArray.get(i).getNumDePom()) + " pomodoros";
+                String content = listOfLists.get(a).get(i).getNameTask() + " - " +
+                        String.valueOf(listOfLists.get(a).get(i).getNumDePom()) + " pomodoros";
 
                 list.add(content);
             }
-            Log.e(TAG, "new Section");
 
-            adapter.addSection(listArray.get(0).getInsertedTime(),
-                            new ArrayAdapter<>(this,
+            Log.e(TAG, "new Section");
+            adapter.addSection(listOfLists.get(a).get(0).getInsertedTime(),
+                    new ArrayAdapter<>(this,
                             android.R.layout.simple_list_item_1,
                             new ArrayList<>(list)));
 
         }
-
 
         listView.setAdapter(adapter);
     }
@@ -85,4 +96,20 @@ public class Historical extends AppCompatActivity {
             return (result);
         }
     };
+
+    public void clearAdapter(View view) {
+
+        try {
+            SharedPreferences sharedPreferences = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.remove(MainActivity.LIST_OF_LISTS_TAG);
+            editor.commit();
+
+            listOfLists.clear();
+            adapter.notifyDataSetChanged();
+
+            this.recreate();
+
+        }catch (Exception e){} // It simply means the user already cleaned the shared and is trying to do it again...
+    }
 }

@@ -255,7 +255,7 @@ public class CurrentTask extends Fragment {
         uiHandler.sendMessage(message);
 
         if (list.get(0).getNumDePom() == 0) {
-            list.remove(0);              // list é decrementada, quem era index 1 agora é index 0.
+            list.remove(0);  // list é decrementada, quem era index 1 agora é index 0.
 
             taskCount++;
             Log.e(TAG, "removido");

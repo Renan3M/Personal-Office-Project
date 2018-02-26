@@ -40,13 +40,22 @@
             android:progressDrawable="@drawable/circular"
             android:secondaryProgress="100" />
 
-        <Button
-            android:id="@+id/restart_btn"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/oval_btn"
-            android:text="STOP" />
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/restart_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/oval_btn"
+                android:text="STOP" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </LinearLayout>

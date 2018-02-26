@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
 
     public Handler mHandler;
 
-    private int oldCount = CurrentTask.taskCount;
+    private int oldCount;
     private int timeService;
 
 
@@ -113,7 +113,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
             }
         };
 
-        if (DailyTask.getListFromShared(getApplicationContext(), LIST_TAG).isEmpty()) {
+        if (DailyTask.getListFromShared(getApplicationContext(), LIST_TAG) == null ||
+                DailyTask.getListFromShared(getApplicationContext(), LIST_TAG).isEmpty()) {
 
             getSupportFragmentManager().beginTransaction().add(R.id.tarefa, blankTask).commit();
 
@@ -155,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
             });
 
 
+            oldCount = CurrentTask.taskCount;
             arrayAdapter = new ArrayAdapter<String>(this, R.layout.main_list_tasks, valuesT) { // valuesT n muda
 
                 @NonNull
@@ -173,6 +175,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
                         textView.setTextColor(Color.YELLOW);
                     }
 
+                    if (list.isEmpty()) CurrentTask.taskCount = 0;
+
                     return textView;
                 }
             };
@@ -184,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
             try{
             for (int i = 0; i < list.get(0).getNumDePom() - 1; i++) {
                 mAdapter.addItem("item " + i);
-            }}catch (IndexOutOfBoundsException e){}
+            }} catch (IndexOutOfBoundsException e){}
 
             listOfPomodors.setAdapter(mAdapter);
 
@@ -277,13 +281,15 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
         startActivity(new Intent(this, DailyTask.class));
     }
 
-    public void intentConfig(View view) {
-    }
+    public void intentConfig(View view) { startActivity(new Intent(this, Configuration.class)); }
 
     public void intentHist(View view) {
-        Intent intent = new Intent(this, Historical.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        if (DailyTask.getListsFromSharedSet(LIST_OF_LISTS_TAG) == null ||
+                DailyTask.getListsFromSharedSet(LIST_OF_LISTS_TAG).isEmpty()){ return; }
+
+                Intent intent = new Intent(this, Historical.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
     }
 
     public ArrayList<DailyTask.IndividualTask> getList() {

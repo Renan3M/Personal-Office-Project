@@ -13,6 +13,7 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="join_us_text">Join us!</string>
     <string name="auth_failed">Autenticação falhou</string>
     <string name="facebook_app_id">171135990314744</string>
     <string name="fb_login_protocol_scheme">fb171135990314744</string>

@@ -12,6 +12,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.ArraySet;
 import android.util.Log;
 import android.view.View;
@@ -31,6 +32,7 @@ import com.personaltools.renan3m.personaloffice.R;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -278,9 +280,11 @@ public class DailyTask extends AppCompatActivity {
 
                             Date data = new Date();
                             data.setTime(System.currentTimeMillis());
+                            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm aa");
+                            String dataFormated = sdf.format(data);
 
                             // Já q n consigo armazenar no objeto lista..
-                            ((IndividualTask)listOfTasks.get(0)).setInsertedTime(data.toGMTString());
+                            ((IndividualTask)listOfTasks.get(0)).setInsertedTime(dataFormated);
 
                             setListToShared(MainActivity.LIST_TAG,listOfTasks);
 
