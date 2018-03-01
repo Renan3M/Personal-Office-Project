@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
     @Override
     protected void onStart() {
         super.onStart();
-        Log.e(TAG, "STAAAARTED");
+
     }
 
 
@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
         setContentView(R.layout.activity_main);
 
         SharedPreferences sP = getApplicationContext().getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        Log.e(TAG, "CREATED");
+
 
         blankTask = new BlankTask();
         currentTask = new CurrentTask();
@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
 
     public void refreshPomodorsList() {
         mAdapter.clear();
-        Log.e(TAG,"refreshed called for pomodors"); // could use a counter and add to the onItemClick of listOfTasks for each
+                                                         // could use a counter and add to the onItemClick of listOfTasks for each
                                                          // refresh, this way I simulate a refresh to the tasks, not needing to
         try {                                            // change their values (valuesT). Or can get the taskCount from current
             for (int i = 0; i < list.get(0).getNumDePom() - 1; i++) {

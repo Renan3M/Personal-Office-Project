@@ -61,7 +61,8 @@
         </service>
 
         <activity android:name=".Activities.Historical" />
-        <activity android:name=".Activities.Configuration"></activity>
+        <activity android:name=".Activities.Configuration" />
+        <activity android:name=".Activities.Registration" />
     </application>
 
 </manifest>

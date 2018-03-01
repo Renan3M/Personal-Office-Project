@@ -1,6 +1,7 @@
 package com.personaltools.renan3m.personaloffice.Activities;
 
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
@@ -50,6 +51,9 @@ import com.personaltools.renan3m.personaloffice.Entity.User;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+
 import static android.Manifest.permission.READ_CONTACTS;
 
 /**
@@ -87,6 +91,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private TextView newAccountTxt;
 
     // Facebook stuff
     CallbackManager callbackManager;
@@ -122,7 +127,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
                 // ...
-            }};
+            }
+        };
 
         mPasswordView = findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -144,17 +150,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
+        newAccountTxt = findViewById(R.id.newAccountTxt);
         mLoginFormView = findViewById(R.id.login_form);
 
         // facebook login
         callbackManager = CallbackManager.Factory.create();
         loginButton = findViewById(R.id.login_button);
-        loginButton.setReadPermissions("email","public_profile");
+        loginButton.setReadPermissions("email", "public_profile");
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 handleFacebookAccessToken(loginResult.getAccessToken()); // esvreve e autentica no firebase
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
 
             }
 
@@ -167,14 +173,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             public void onError(FacebookException error) {
 
             }
-
-
         });
-
-        // Automatic login (making use of the persistence provided by this widget)
-        if (loginButton.getText().equals(getResources().getString(R.string.facebook_logout_text))){
-            startActivity(new Intent(getApplicationContext(), MainActivity.class)); }
     }
+
+
 
     private void handleFacebookAccessToken(AccessToken token) {
         Log.d(TAG, "handleFacebookAccessToken:" + token);
@@ -193,7 +195,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                             mDatabase.child(task.getResult().getUser().getUid()).setValue(user);
 
-
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
 
 
                         } else {
@@ -209,12 +211,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     public void onStart() {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
-
-         // E se eu quiser mudar de usuario?
-           /*
-            if (loginButton.getText().equals(getResources().getString(R.string.facebook_logout_text))){
-            startActivity(new Intent(getApplicationContext(), MainActivity.class)); }
-           */
+        newAccountTxt.setVisibility(View.GONE);
     }
 
     private void populateAutoComplete() {
@@ -268,6 +265,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private void attemptLogin() {
 
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        // Allow to be clicked, after first try to login
+                        newAccountTxt.setVisibility(View.VISIBLE);
+                    }
+                }, 1500);
+
 
         // Reset errors.
         mEmailView.setError(null);
@@ -317,58 +322,42 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
-                            Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
+                            if (task.isSuccessful()) {
+                                Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
 
-                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                                if (!FirebaseAuth.getInstance().getCurrentUser().isEmailVerified())
+                                    Toast.makeText(LoginActivity.this, "Please verify your email address",
+                                            Toast.LENGTH_SHORT).show();
+                                else {
+                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                    finish();
+                                }
+                            }
 
                             if (!task.isSuccessful()) {
                                 Log.w(TAG, "signInWithEmail:failed", task.getException());
 
-                                createUser(email,password);
                                 return;
                             }
 
-                            finish();
+
 
                         }
                     });
-
         }
         }
 
-        private void createUser(String email, String password){
-            // TODO: register the new account here.
-            mAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
-
-                            try {
-                                user = new User(task.getResult().getUser().getDisplayName(),
-                                        task.getResult().getUser().getEmail());
-
-                                mDatabase.child(task.getResult().getUser().getUid()).setValue(user);
-                            }catch (Exception e){
-                                Log.e(TAG,e.getMessage().toString());}
-
-                            // If sign in fails, display a message to the user. If sign in succeeds
-                            // the auth state listener will be notified and logic to handle the
-                            // signed in user can be handled in the listener.
-                            if (!task.isSuccessful()) {
-
-                            }
-
-                            // ...
-                        }
-                    });
-        }
 
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-
-        return email.contains("@");
+        boolean result = true;
+        try {
+            InternetAddress emailAddr = new InternetAddress(email);
+            emailAddr.validate();
+        } catch (AddressException ex) {
+            result = false;
+        }
+        return result;
     }
 
     private boolean isPasswordValid(String password) {
@@ -453,6 +442,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
         mEmailView.setAdapter(adapter);
+    }
+
+    public void enterWithoutAccount(View view) {
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+    }
+
+    public void registerAccount(View view) {
+        startActivity(new Intent(getApplicationContext(),Registration.class));
     }
 
 
