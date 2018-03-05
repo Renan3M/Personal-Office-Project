@@ -5,12 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -19,26 +15,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.personaltools.renan3m.personaloffice.Activities.Authentication.Configuration;
 import com.personaltools.renan3m.personaloffice.Fragments.*;
 import com.personaltools.renan3m.personaloffice.R;
 
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.IllegalFormatCodePointException;
-import java.util.List;
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements OnTaskInteraction {
 
@@ -48,14 +38,14 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
 
     public static final int HANDLER_UPDATE_POMODOR_LIST = 0;
     public static final int HANDLER_UPDATE_TASK_LIST = 1;
+
     public static final String CURRENT_TASK_FLAG = "Current_task_flag";
     public static final String LIST_TAG = "list";
-    public static final String LIST_OF_LISTS_TAG = "list_of_lists"; // So ugly, jesus..
+    public static final String LIST_OF_LISTS_TAG = "list_of_lists"; // So ugly, Jesus..
 
 
     private BlankTask blankTask;
     private CurrentTask currentTask;
-    private WaitingTask waitingTask;
 
     private ListView listOfTasks;
     private ListView listOfPomodors;
@@ -65,15 +55,24 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
 
     private MyCustomAdapter mAdapter;
 
-    public Handler mHandler;
+    private SharedPreferences sharedPreferences;
+
+    public static Handler mHandler;
 
     private int oldCount;
     private int timeService;
 
 
     @Override
-    protected void onStart() {
+    protected void onStart() { // Torço para q esteja funcionando meu "keep screen on"
         super.onStart();
+
+        // Deveria fazer essa verificação somente caso a activity que tenha dado start aqui tenha sido a Configuration. (memória)
+        if (sharedPreferences.getBoolean(Configuration.SWITCH_STATE_SCREEN, false)) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        } else
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
 
     }
 
@@ -88,10 +87,12 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
 
         SharedPreferences sP = getApplicationContext().getSharedPreferences(MainActivity.PREFS_NAME, 0);
 
+        Log.e(TAG,"create method called");
+        sharedPreferences = getSharedPreferences(Configuration.CONFIG_SHARED, 0);
+
 
         blankTask = new BlankTask();
         currentTask = new CurrentTask();
-        waitingTask = new WaitingTask();
 
         listOfTasks = findViewById(R.id.lista_de_tarefas_do_dia);
         listOfPomodors = findViewById(R.id.lista_de_pomodoros);
@@ -122,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
 
         } else if (getIntent().hasExtra(CURRENT_TASK_FLAG) || sP.contains(LIST_TAG)) {
             CurrentTask.taskCount = 0;
+
             if (getIntent().getExtras().getInt(CURRENT_TASK_FLAG) != 0) {
                 NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                 mNotificationManager.cancel(1);
@@ -143,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
             try {
             for (int i = 0; i < list.size(); i++) {
                 valuesT.add("Tarefa " + (i + 1) + "\n(" +list.get(i).getNumDePom() +")");
-            }}catch (IndexOutOfBoundsException e){}
+            }}catch (IndexOutOfBoundsException e){e.getLocalizedMessage();}
 
             listOfTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -188,14 +190,13 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
             try{
             for (int i = 0; i < list.get(0).getNumDePom() - 1; i++) {
                 mAdapter.addItem("item " + i);
-            }} catch (IndexOutOfBoundsException e){}
+            }} catch (IndexOutOfBoundsException e){e.getLocalizedMessage();}
 
             listOfPomodors.setAdapter(mAdapter);
 
 
             getSupportFragmentManager().beginTransaction().replace(R.id.tarefa, currentTask).commit();
 
-            return;
 
         } else getSupportFragmentManager().beginTransaction().add(R.id.tarefa, blankTask).commit();
 
@@ -225,16 +226,16 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
         private ArrayList mData = new ArrayList();
         private LayoutInflater mInflater;
 
-        public MyCustomAdapter() {
+        MyCustomAdapter() {
             mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
-        public void addItem(final String item) {
+        void addItem(final String item) {
             mData.add(item);
             notifyDataSetChanged();
         }
 
-        public void clear() {
+        void clear() {
             mData.clear();
             notifyDataSetChanged();
         }
@@ -273,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
 
     }
 
-    public static class ViewHolder {
+    static class ViewHolder {
         public ImageView imageView;
     }
 

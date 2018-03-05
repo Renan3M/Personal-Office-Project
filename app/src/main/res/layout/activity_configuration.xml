@@ -4,8 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/gradient_main_background"
     android:orientation="vertical"
-    tools:context="com.personaltools.renan3m.personaloffice.Activities.Configuration">
+    tools:context="com.personaltools.renan3m.personaloffice.Activities.Authentication.Configuration">
 
 
     <TextView
@@ -20,13 +21,12 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Alterar senha: " />
 
         <EditText
-            android:id="@+id/editText3"
+            android:id="@+id/txt_redefine_password"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -34,7 +34,7 @@
             android:inputType="textPassword" />
 
         <ImageButton
-            android:id="@+id/imageButton"
+            android:id="@+id/btn_redefine_password"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="0"
@@ -49,22 +49,65 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/textView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Login automatico " />
 
         <Switch
-            android:id="@+id/switch1"
+            android:id="@+id/switch_prefs_user"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/button2"
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:onClick="logUserOut"
+        android:text="User logout"
+        android:textStyle="bold" />
+
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="logUserOut"
-        android:text="logout" />
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Configurações da aplicação"
+        android:textAlignment="center" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Manter tela ligada " />
+
+        <Switch
+            android:id="@+id/switch_screen_lock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Desligar o som " />
+
+        <Switch
+            android:id="@+id/switch_sound_enable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
 </LinearLayout>

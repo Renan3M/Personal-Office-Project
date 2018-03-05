@@ -1,49 +1,37 @@
 package com.personaltools.renan3m.personaloffice.Fragments;
 
-import android.Manifest;
-import android.annotation.TargetApi;
-import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
+import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.PowerManager;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.PermissionChecker;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.personaltools.renan3m.personaloffice.Activities.Authentication.Configuration;
 import com.personaltools.renan3m.personaloffice.Activities.DailyTask;
-import com.personaltools.renan3m.personaloffice.Activities.Historical;
 import com.personaltools.renan3m.personaloffice.Activities.MainActivity;
 import com.personaltools.renan3m.personaloffice.Notification.MyNotificationService;
 import com.personaltools.renan3m.personaloffice.R;
 import com.personaltools.renan3m.personaloffice.Widgets.PomtimeWidget;
 
-import java.lang.reflect.Method;
-import java.security.Permission;
 import java.util.ArrayList;
 
-import static android.os.PowerManager.SCREEN_DIM_WAKE_LOCK;
-import static java.lang.Thread.MIN_PRIORITY;
 import static java.lang.Thread.sleep;
 
 public class CurrentTask extends Fragment {
 
-  //  public static final int TIMER_RUNTIME = 1500000; // 25 min
+    public static final int TIMER_RUNTIME = 1500000; // 25 min
 
-    public static final int TIMER_RUNTIME = 10000; // 1 min
-
+    //public static final int TIMER_RUNTIME = 20000; // for testing
 
     private static final int UPDATE_TIMER = 0;
     private static final int RESET_TIMER = 1;
@@ -68,7 +56,11 @@ public class CurrentTask extends Fragment {
     private Thread timerThread;
     private int timePassedPlus = 0;
 
-    private Handler uiHandler;
+    private MediaPlayer mp;
+
+    private static Handler uiHandler;
+
+    private SharedPreferences sharedPreferences;
 
     private View view;
 
@@ -87,17 +79,21 @@ public class CurrentTask extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        if (timeService == 0){ taskCount = 0;}
+        if (timeService == 0) {
+            taskCount = 0;
+        }
 
         view = inflater.inflate(R.layout.fragment_current_task, container, false);
         // Inflate the layout for this fragment
 
-        Log.e(TAG,"Notification created this again, idk why...");
-
         taskName = view.findViewById(R.id.current_task_name_txt);
         taskName.setText(list.get(0).getNameTask());
 
-        intent = new Intent(getActivity(),MyNotificationService.class);
+        sharedPreferences = getActivity().getSharedPreferences(Configuration.CONFIG_SHARED, 0);
+
+        mp = MediaPlayer.create(getActivity(), R.raw.whatsapp_whistle);
+
+        intent = new Intent(getActivity(), MyNotificationService.class);
 
         txtTime = view.findViewById(R.id.time_txt_plzfindme);
 
@@ -136,13 +132,13 @@ public class CurrentTask extends Fragment {
                             txtTime.setText("(" + String.valueOf((TIMER_RUNTIME - time) / 60000 + " : "
                                     + timePassedPlus / 1000 + ")"));
 
-                            if (startService && getActivity() != null){
+                            if (startService && getActivity() != null) {
 
                                 intent.putExtra("time", time);
                                 getActivity().startService(intent);
 
                                 startService = false;
-                                
+
                             }
 
 
@@ -167,6 +163,8 @@ public class CurrentTask extends Fragment {
 
         timerThread = new Thread() { // A thread tem acesso aos métodos da classe, todavía péssima pratica! (referencia)
             // Um Assync task ia substituir muito bem a função dessa thread, atualizando a UI sem q eu precise me preocupar com handler.
+            // Futuramente mudar isso pra ser um asynctask
+
             @Override
             public void run() {
                 synchronized (this) {
@@ -204,12 +202,6 @@ public class CurrentTask extends Fragment {
 
         if (!list.isEmpty()) timerThread.start();
 
-    //    mPowerManager = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
-
-        int flags = WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
-
-        getActivity().getWindow().addFlags(flags); // this is how your app will wake up the screen you will call this activity later
 
         return view;
     }
@@ -241,6 +233,8 @@ public class CurrentTask extends Fragment {
 */
 
     private void onContinue(int waited) {
+
+        if (!sharedPreferences.getBoolean(Configuration.SWITCH_STATE_SOUND, false)) mp.start();
 
         btnReseted = true; // Da permissão para iniciar a proxima thread e mudar o texto no botão p/ STOP
 
@@ -277,11 +271,10 @@ public class CurrentTask extends Fragment {
         // Aqui vou apenas salvar no sharedPreferences para lá acessar.
         if (list.isEmpty()) {
 
-            DailyTask.setListToSharedSet(getActivity(),MainActivity.LIST_OF_LISTS_TAG); // Uma vez que a lista de tarefas acabou
-            DailyTask.setListToShared(MainActivity.LIST_TAG,new ArrayList<>()); // Reseta o sharedList
+            DailyTask.setListToSharedSet(getActivity(), MainActivity.LIST_OF_LISTS_TAG); // Uma vez que a lista de tarefas acabou
+            DailyTask.setListToShared(MainActivity.LIST_TAG, new ArrayList<>()); // Reseta o sharedList
         }
     }
-
 
 
     private void updateProgressBar(final int timePassed) {
@@ -297,7 +290,7 @@ public class CurrentTask extends Fragment {
         super.onStop();
         stopService = false;
         startService = true;
-        Log.e(TAG,"service ready to start, waiting for thread to pass the current time count");
+        Log.e(TAG, "service ready to start, waiting for thread to pass the current time count");
     }
 
     @Override
@@ -305,15 +298,16 @@ public class CurrentTask extends Fragment {
         super.onStart();
 
 
-    //    if (mPowerManager == null) mPowerManager = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
+        //    if (mPowerManager == null) mPowerManager = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
 
-        if (timeService != 0 && txtTime != null) txtTime.setText("(" + String.valueOf((TIMER_RUNTIME - timeService)
-                / 60000 + " : " + timePassedPlus / 1000 + ")"));
+        if (timeService != 0 && txtTime != null)
+            txtTime.setText("(" + String.valueOf((TIMER_RUNTIME - timeService)
+                    / 60000 + " : " + timePassedPlus / 1000 + ")"));
 
         stopService = true; // <-- Flag usada pelo serviço
 
         // Parando a notificação
-        Intent intent = new Intent(getActivity(),MyNotificationService.class);
+        Intent intent = new Intent(getActivity(), MyNotificationService.class);
         getActivity().stopService(intent);
     }
 
@@ -336,7 +330,9 @@ public class CurrentTask extends Fragment {
 
             timeService = ((MainActivity) mListener).getTimeService();
 
-            if (list == null){Log.e(TAG,"ERROR, LISTA É NULA!");}
+            if (list == null) {
+                Log.e(TAG, "ERROR, LISTA É NULA!");
+            }
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteraction listener");
@@ -357,7 +353,7 @@ public class CurrentTask extends Fragment {
 
         mActivity = false;
 
-        if (btnReseted ){
+        if (btnReseted) {
             Thread thread = new Thread(timerThread);
             thread.setPriority(Thread.MIN_PRIORITY);
             thread.start();

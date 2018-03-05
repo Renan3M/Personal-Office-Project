@@ -1,8 +1,8 @@
-package com.personaltools.renan3m.personaloffice.Activities;
+package com.personaltools.renan3m.personaloffice.Activities.Authentication;
 
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -45,6 +45,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.personaltools.renan3m.personaloffice.Activities.MainActivity;
 import com.personaltools.renan3m.personaloffice.R;
 import com.personaltools.renan3m.personaloffice.Entity.User;
 
@@ -105,7 +106,26 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         // Set up the login form.
         mEmailView = findViewById(R.id.email);
+        mPasswordView = findViewById(R.id.password);
         populateAutoComplete();
+
+        loginButton = findViewById(R.id.login_button);
+
+        SharedPreferences sharedPreferences = getSharedPreferences(Configuration.CONFIG_SHARED,0);
+        if (sharedPreferences.getBoolean(Configuration.SWITCH_STATE_LOGIN,false)) {
+
+        try{
+            if (getIntent().hasExtra("oldUserEmail")) {
+                mEmailView.setText(getIntent().getExtras().getString("oldUserEmail"));
+            } else
+                mEmailView.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+        } catch(NullPointerException e){}
+
+            if(loginButton.getText().toString().equals(getString(R.string.facebook_logout_text))){
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                finish();
+            }
+        }
 
         // DataBase stuff
         mDatabase = FirebaseDatabase.getInstance().getReference("users");
@@ -130,7 +150,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         };
 
-        mPasswordView = findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -142,7 +161,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        Button mEmailSignInButton = findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -155,7 +174,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         // facebook login
         callbackManager = CallbackManager.Factory.create();
-        loginButton = findViewById(R.id.login_button);
+
         loginButton.setReadPermissions("email", "public_profile");
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
@@ -179,6 +198,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
     private void handleFacebookAccessToken(AccessToken token) {
+
         Log.d(TAG, "handleFacebookAccessToken:" + token);
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
@@ -325,9 +345,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             if (task.isSuccessful()) {
                                 Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
 
-                                if (!FirebaseAuth.getInstance().getCurrentUser().isEmailVerified())
+                                if (!FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
                                     Toast.makeText(LoginActivity.this, "Please verify your email address",
                                             Toast.LENGTH_SHORT).show();
+
+                                }
                                 else {
                                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                     finish();
@@ -346,8 +368,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     });
         }
         }
-
-
 
     private boolean isEmailValid(String email) {
         boolean result = true;

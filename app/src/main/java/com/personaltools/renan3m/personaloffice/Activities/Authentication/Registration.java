@@ -1,5 +1,5 @@
 
-package com.personaltools.renan3m.personaloffice.Activities;
+package com.personaltools.renan3m.personaloffice.Activities.Authentication;
 
 import android.app.ProgressDialog;
 import android.support.annotation.NonNull;
@@ -135,7 +135,7 @@ public class Registration extends AppCompatActivity {
     }
 
     public void onSignupFailed() {
-        Toast.makeText(getBaseContext(), "Email already exists", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "Email invalid", Toast.LENGTH_LONG).show();
 
         _signupButton.setEnabled(true);
     }
@@ -177,7 +177,7 @@ public class Registration extends AppCompatActivity {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
+                    public void onComplete(@NonNull Task<AuthResult> task) {  // Pode pegar o user pela task e enviar o email tb
                         Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
 
                         try {
