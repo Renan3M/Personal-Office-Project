@@ -1,7 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:custom="http://schemas.android.com/apk/res-auto"
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
@@ -10,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Laurem ipsum"
+        android:text="@string/txt_laurem_ipsum_test"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
@@ -18,7 +17,6 @@
         android:id="@+id/time_txt_plzfindme"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="0"
         android:textAlignment="center" />
 
     <LinearLayout
@@ -33,7 +31,6 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_centerInParent="false"
             android:indeterminate="false"
             android:max="100"
             android:progress="0"
@@ -48,11 +45,11 @@
             <Button
                 android:id="@+id/restart_btn"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:background="@drawable/oval_btn"
-                android:text="STOP" />
+                android:text="@string/txt_stop" />
 
         </LinearLayout>
 

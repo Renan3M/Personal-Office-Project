@@ -28,9 +28,19 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.personaltools.renan3m.personaloffice.Fragments.BlankTask;
+import com.personaltools.renan3m.personaloffice.Fragments.CurrentTask;
 import com.personaltools.renan3m.personaloffice.R;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -76,6 +86,9 @@ public class DailyTask extends AppCompatActivity {
     private EditText taskName;
 
     private ListView list;
+
+    private String jsonString;
+    private TextView quotePlace;
 
 
     // Classe que simboliza uma tarefa definida pelo usuario
@@ -159,6 +172,8 @@ public class DailyTask extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_daily_task);
 
+        quotePlace = findViewById(R.id.txt_daily_quote);
+
         sharedPreferences = getApplicationContext().getSharedPreferences(MainActivity.PREFS_NAME,0);
         editor = sharedPreferences.edit();
 
@@ -190,6 +205,45 @@ public class DailyTask extends AppCompatActivity {
         };
 
         dialogConfirmacao = criaDialogConfirmacao();
+
+        InputStream resourceReader =  getResources().openRawResource(R.raw.quotes);
+        Writer writer = new StringWriter();
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(resourceReader, "UTF-8"));
+            String line = reader.readLine();
+            while (line != null) {
+                writer.write(line);
+                line = reader.readLine();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Unhandled exception while using BlankTask", e);
+        } finally {
+            try {
+                resourceReader.close();
+            } catch (Exception e) {
+                Log.e(TAG, "Unhandled exception while using BlankTask", e);
+            }
+        }
+
+        jsonString = writer.toString();
+
+        try {
+            JSONArray JA = new JSONArray(jsonString);
+
+            int n = (int)(Math.random() * (JA.length()-1));
+
+            JSONObject JO = (JSONObject) JA.get(n);
+            Log.e(TAG,JO.get("quote").toString());
+
+            StringBuilder builder = new StringBuilder();
+            builder.append(JO.get("quote").toString());
+            builder.append(" - ");
+            builder.append(JO.get("name").toString());
+
+            quotePlace.setText(builder);
+
+
+        } catch (Exception e){Log.e(TAG,e.getMessage());}
     }
 
     public static ArrayList<IndividualTask> getListFromShared(Context ctx, String key){
@@ -288,6 +342,8 @@ public class DailyTask extends AppCompatActivity {
 
                             setListToShared(MainActivity.LIST_TAG,listOfTasks);
 
+                            CurrentTask.stopThread = true;
+
                             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
 
                             intent.putExtra(MainActivity.CURRENT_TASK_FLAG, "");
@@ -315,6 +371,7 @@ public class DailyTask extends AppCompatActivity {
     }
 
     public void addOnClick(View view) {
+
         if (taskName.getText().length() != 0 && taskName.getText().length() < 35) { // not empty
 
             Toast.makeText(this, "Dados inseridos", Toast.LENGTH_SHORT).show();
@@ -327,6 +384,9 @@ public class DailyTask extends AppCompatActivity {
             ListAdapter listAdapter = (ListAdapter) list.getAdapter();
             listAdapter.add(taskName.getText().toString());
             listAdapter.notifyDataSetChanged();
+
+            taskName.setText("");
+            return;
 
         } else if (taskName.getText().length() == 0) {
 

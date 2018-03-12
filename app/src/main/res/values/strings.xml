@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Personal office</string>
+    <string name="app_name">Work is done</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -23,21 +23,41 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="initial_instructions_text_en"> Before using this app for the first time, please consider reading this brief
-    instruction. As you are quite aware, this app is made for self-organization purposes. \n\nThere are three buttons above, the
-    first one \"Daily task\" is where you set your tasks for the day and the pomodors they will take to be accomplished, if you
-    don\'t it will re-use your last task sequence defined by you. \n\nThe second button \"configs\" is where you set the time of each
-    interval and others prefs configurations. \n\nThe last one is not yet available as I'm working on it right now, so please be
-    patient and enjoy all the others functionalities I am freely giving to you, for improving you focus on your tasks. </string>
+    <string name="initial_instructions_text_en">
+        <!-- Pomodoro instructions -->
+        </string>
 
-    <string name="initial_instructions_text_pt"> Antes de utilizar este app pela primeira vez, por favor considere ler essa breve
-    instrução. Como você está completamente ciente, este app é feito para finalidades da auto-organização. \n\n Existem três botões
-    acima, o primeiro \"Tarefa do dia\" é onde você definir suas tarefas para o dia e os pomodoros que elas vão precisar para serem
-    realizadas, se você não defini-las elas vão re-usar a sua última seqüência de tarefas que você definiu. \n\nO segundo botão
-    \"configurações\" é onde você define a hora de cada intervalo e outros configurações de sua preferencia. \n\nO último ainda não está
-    disponível e eu estou trabalhando nisso agora, por favor, seja paciente e desfrute de todas as outras funcionalidades que eu
-    estou dando livremente para você, para melhorar sua produtividade em suas tarefas. </string>
+    <string name="initial_instructions_text_pt">
+        Esse aplicativo te auxiliará a desenvolver foco em suas atividades do dia, para usa-lo é bom ter uma introdução da
+        técnica aqui escolhida, esta é conhecida pelo nome de técnica do pomodoro (tomate em italiano).
+        \n\n
+        Elaborada no fim da década de 1980, ela se baseia na ideia de que fluxos de trabalho divididos em blocos podem
+        melhorar a agilidade do cérebro e estimular o foco.\n\n Depois de muita pesquisa, Cirillo chegou ao período de 25 minutos
+        como sendo o tempo ideal para esses blocos, também conhecidos como “pomodoros”.
+        </string>
+    <string name="txt_profile_settings">Configurações de perfil</string>
+    <string name="txt_change_password">Alterar senha:</string>
+    <string name="txt_auto_login">Login automatico</string>
+    <string name="txt_user_logout">User logout</string>
+    <string name="txt_application_settings">Configurações da aplicação</string>
+    <string name="txt_keep_screen_on">Manter tela ligada</string>
+    <string name="txt_turn_off_sound">Desligar o som</string>
+    <string name="txt_go">GO!</string>
+    <string name="txt_clear_list">Clear list</string>
+    <string name="txt_want_to_create_a_new_account">Want to create a new account?</string>
+    <string name="txt_i_don_t_want_to_register">I don\'t want to register</string>
+    <string name="txt_daily_task">Tarefas do dia</string>
+    <string name="txt_config">Configurações</string>
+    <string name="txt_historic">Histórico</string>
+    <string name="txt_register">Register</string>
+    <string name="txt_name">Name</string>
+    <string name="txt_email">Email</string>
+    <string name="txt_password">Password</string>
+    <string name="txt_create_account">Create Account</string>
+    <string name="txt_already_a_member_login">Already a member? Login</string>
+    <string name="img_description_remove">remove_btn</string>
+    <string name="txt_laurem_ipsum_test">Laurem ipsum</string>
+    <string name="txt_stop">STOP</string>
+    <string name="image_description_pomodor">pomodor image</string>
 
-    <string name="motivational_quote"> Vou substituir a instruction (que será mostrada uma unica vez) para essa string que carregará
-    um frase motivacional sempre que o usuario abrir o app, como farei isso? json talvez? cuido disso no futuro. </string>
 </resources>

@@ -5,6 +5,8 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -42,7 +44,7 @@ public class MyNotificationService extends IntentService {
             mIntent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
 
         builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ship_icon)
+                .setSmallIcon(R.drawable.apple_off)
                 .setAutoCancel(true)
                 .setOngoing(true)
                 .setContentTitle("Pomodoro time left...");

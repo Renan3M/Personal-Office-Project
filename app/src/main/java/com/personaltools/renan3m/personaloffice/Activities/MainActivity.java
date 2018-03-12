@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
 
 
     @Override
-    protected void onStart() { // Torço para q esteja funcionando meu "keep screen on"
+    protected void onStart() {
         super.onStart();
 
         // Deveria fazer essa verificação somente caso a activity que tenha dado start aqui tenha sido a Configuration. (memória)
@@ -84,6 +84,11 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
         if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0){finish(); return;}
 
         setContentView(R.layout.activity_main);
+
+        /*android.support.v7.app.ActionBar menu = getSupportActionBar();
+        menu.setDisplayShowHomeEnabled(true);
+        menu.setLogo(R.drawable.ship_icon);
+        menu.setDisplayUseLogoEnabled(true);*/
 
         SharedPreferences sP = getApplicationContext().getSharedPreferences(MainActivity.PREFS_NAME, 0);
 

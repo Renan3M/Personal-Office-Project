@@ -1,5 +1,4 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -104,7 +103,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_weight="0"
                     android:onClick="registerAccount"
-                    android:text="Want to create a new account?"
+                    android:text="@string/txt_want_to_create_a_new_account"
                     android:textAlignment="center" />
 
                 <com.facebook.login.widget.LoginButton xmlns:facebook="http://schemas.android.com/apk/res-auto"
@@ -123,7 +122,7 @@
                     android:layout_marginBottom="5dp"
                     android:layout_weight="0"
                     android:onClick="enterWithoutAccount"
-                    android:text="I don't want to register"
+                    android:text="@string/txt_i_don_t_want_to_register"
                     android:textAlignment="center" />
 
             </LinearLayout>

@@ -29,14 +29,14 @@ import static java.lang.Thread.sleep;
 
 public class CurrentTask extends Fragment {
 
-    public static final int TIMER_RUNTIME = 1500000; // 25 min
+    private final String TAG = "CurrentTask";
 
-    //public static final int TIMER_RUNTIME = 20000; // for testing
+    public static final int TIMER_RUNTIME = 1500000; // 25 min
+    //public static final int TIMER_RUNTIME = 20000; // for testing (10s)
 
     private static final int UPDATE_TIMER = 0;
     private static final int RESET_TIMER = 1;
     private static final int RESET_BTN = 2;
-    private final String TAG = "CurrentTask";
 
     public static int taskCount;
 
@@ -51,10 +51,10 @@ public class CurrentTask extends Fragment {
     private Intent intent;
 
     private boolean mActivity;
-    private boolean btnReseted = false;
+    private boolean btnReseted;
 
     private Thread timerThread;
-    private int timePassedPlus = 0;
+    private int timePassedPlus;
 
     private MediaPlayer mp;
 
@@ -69,6 +69,7 @@ public class CurrentTask extends Fragment {
     public static boolean stopService;
     private boolean startService;
     private int timeService;
+    public static boolean stopThread;
 
     public CurrentTask() {
         // Required empty public constructor
@@ -89,9 +90,13 @@ public class CurrentTask extends Fragment {
         taskName = view.findViewById(R.id.current_task_name_txt);
         taskName.setText(list.get(0).getNameTask());
 
+        btnReseted = false;
+
+        timePassedPlus = 0;
+
         sharedPreferences = getActivity().getSharedPreferences(Configuration.CONFIG_SHARED, 0);
 
-        mp = MediaPlayer.create(getActivity(), R.raw.whatsapp_whistle);
+        mp = MediaPlayer.create(getActivity(), R.raw.bell_ringtong);
 
         intent = new Intent(getActivity(), MyNotificationService.class);
 
@@ -170,11 +175,17 @@ public class CurrentTask extends Fragment {
                 synchronized (this) {
                     mActivity = true;
                     int waited = timeService;
-
+                    if (getActivity().getIntent().hasExtra(MainActivity.CURRENT_TASK_FLAG)){
+                        try {
+                            sleep(1000); // A thread só avalia o stopThread à cada 1seg
+                            stopThread = false;
+                        }catch (Exception e){}
+                    }
 
                     try {
-                        while (mActivity && (waited < TIMER_RUNTIME)) {
+                        while (mActivity && (waited < TIMER_RUNTIME) && !stopThread) {
                             sleep(1000);
+
                             if (mActivity) {
                                 waited += 1000;
 
@@ -187,6 +198,7 @@ public class CurrentTask extends Fragment {
 
                                 updateProgressBar(waited);
                             }
+
                         }
                     } catch (InterruptedException e) {
                         Log.e(TAG, e.getLocalizedMessage());
@@ -200,7 +212,7 @@ public class CurrentTask extends Fragment {
         };
         timerThread.setPriority(Thread.MIN_PRIORITY);
 
-        if (!list.isEmpty()) timerThread.start();
+        if (!list.isEmpty()) timerThread.start(); // A 'M' tá aqui... Ele chama o onCreate(), do Task pra cá... (Intent flaged for new task...)
 
 
         return view;
@@ -234,12 +246,11 @@ public class CurrentTask extends Fragment {
 
     private void onContinue(int waited) {
 
-        if (!sharedPreferences.getBoolean(Configuration.SWITCH_STATE_SOUND, false)) mp.start();
-
         btnReseted = true; // Da permissão para iniciar a proxima thread e mudar o texto no botão p/ STOP
 
         if (waited != TIMER_RUNTIME) return; // Thread interrompida
 
+        if (!sharedPreferences.getBoolean(Configuration.SWITCH_STATE_SOUND, false)) mp.start();
 
         list.get(0).decreasePom();
         Log.e(TAG, "decrementado");
@@ -297,19 +308,17 @@ public class CurrentTask extends Fragment {
     public void onStart() {
         super.onStart();
 
-
-        //    if (mPowerManager == null) mPowerManager = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
-
-        if (timeService != 0 && txtTime != null)
-            txtTime.setText("(" + String.valueOf((TIMER_RUNTIME - timeService)
-                    / 60000 + " : " + timePassedPlus / 1000 + ")"));
-
         stopService = true; // <-- Flag usada pelo serviço
 
         // Parando a notificação
         Intent intent = new Intent(getActivity(), MyNotificationService.class);
         getActivity().stopService(intent);
-    }
+
+        if (timeService != 0 && txtTime != null) {
+            txtTime.setText("(" + String.valueOf((TIMER_RUNTIME - timeService)
+                    / 60000 + " : " + timePassedPlus / 1000 + ")"));
+        }
+        }
 
     private void resetProgress() {
         pomtimeWidget.setProgress(0);

@@ -12,7 +12,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Configurações de perfil"
+        android:text="@string/txt_profile_settings"
         android:textAlignment="center" />
 
     <LinearLayout
@@ -23,7 +23,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Alterar senha: " />
+            android:text="@string/txt_change_password" />
 
         <EditText
             android:id="@+id/txt_redefine_password"
@@ -51,7 +51,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Login automatico " />
+            android:text="@string/txt_auto_login" />
 
         <Switch
             android:id="@+id/switch_prefs_user"
@@ -65,7 +65,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:onClick="logUserOut"
-        android:text="User logout"
+        android:text="@string/txt_user_logout"
         android:textStyle="bold" />
 
     <TextView
@@ -73,7 +73,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
-        android:text="Configurações da aplicação"
+        android:text="@string/txt_application_settings"
         android:textAlignment="center" />
 
     <LinearLayout
@@ -84,7 +84,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Manter tela ligada " />
+            android:text="@string/txt_keep_screen_on" />
 
         <Switch
             android:id="@+id/switch_screen_lock"
@@ -102,7 +102,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Desligar o som " />
+            android:text="@string/txt_turn_off_sound" />
 
         <Switch
             android:id="@+id/switch_sound_enable"
