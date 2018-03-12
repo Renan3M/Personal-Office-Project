@@ -59,5 +59,6 @@
     <string name="txt_laurem_ipsum_test">Laurem ipsum</string>
     <string name="txt_stop">STOP</string>
     <string name="image_description_pomodor">pomodor image</string>
+    <string name="img_description_plus_btn">plus_btn</string>
 
 </resources>

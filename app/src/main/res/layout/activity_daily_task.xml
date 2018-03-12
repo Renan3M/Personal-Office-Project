@@ -12,7 +12,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:baselineAligned="false">
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -46,7 +47,8 @@
                 android:layout_height="wrap_content"
                 android:background="#00000000"
                 android:onClick="addOnClick"
-                app:srcCompat="@drawable/plus_btn" />
+                app:srcCompat="@drawable/plus_btn"
+                android:contentDescription="@string/img_description_plus_btn" />
 
         </LinearLayout>
 
@@ -78,7 +80,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:targetApi="jelly_bean" />
 
 
     </android.support.constraint.ConstraintLayout>
