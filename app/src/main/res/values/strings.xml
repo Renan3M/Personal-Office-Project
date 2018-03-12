@@ -24,7 +24,12 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="initial_instructions_text_en">
-        <!-- Pomodoro instructions -->
+        This app will help you develop focus on your day\'s activities, for using it, you should have an introduction to the
+        technique chosen here, this one is known by the name of pomodoro technique (tomato in Italian).
+        \n\n
+        Elaborated in the late 1980s, it is based on the idea that workflows divided into blocks can
+        improve brain agility and stimulate focus.\n\n After much research, Cirillo arrived within the 25 minute period
+        as being the ideal time for these blocks, also known as “pomodoros”.
         </string>
 
     <string name="initial_instructions_text_pt">
