@@ -166,7 +166,9 @@ public class CurrentTask extends Fragment {
             }
         };
 
-        timerThread = new Thread() { // A thread tem acesso aos métodos da classe, todavía péssima pratica! (referencia)
+        timerThread = new Thread() {
+
+            // A thread tem acesso aos métodos da classe, todavía péssima pratica! (referencia)
             // Um Assync task ia substituir muito bem a função dessa thread, atualizando a UI sem q eu precise me preocupar com handler.
             // Futuramente mudar isso pra ser um asynctask
 
