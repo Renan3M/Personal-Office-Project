@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.renderscript.Script;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,6 +27,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.personaltools.renan3m.personaloffice.Fragments.BlankTask;
@@ -51,14 +59,6 @@ import java.util.List;
 import java.lang.String;
 import java.util.Set;
 import java.util.TreeSet;
-
-
-// A grande gambiara nessa activity é porque eu só adiciono os Individual tasks na listOfTasks (que são enviados na intent pra
-// main) depois que eu clico no botão "Go!", logo, se eu adcionar clicando no btn com simbolo de '+' apos escrever o nome da task
-// ele somente adiciona aos itens do adapter (visual), mesma coisa serve para o btn com simbolo de 'x', este remove tão somente
-// do adapter. Talvez uma soluçao seja já adicionar simultanemante à lista e ao adapter, criando inicialmente a task com apenas
-// o nome, e depois adciona a informação referente aos pomodoros na task já criada. (Sem precisar clicar no btn p cria-las de
-// fato, que é o caso agora).  Tenho q mudar essa porra toda, vai ter jeito não...
 
 public class DailyTask extends AppCompatActivity {
 
@@ -89,6 +89,7 @@ public class DailyTask extends AppCompatActivity {
 
     private String jsonString;
     private TextView quotePlace;
+
 
 
     // Classe que simboliza uma tarefa definida pelo usuario
@@ -154,7 +155,11 @@ public class DailyTask extends AppCompatActivity {
 
         public void decreasePom() {
             this.numDePom--;
+
         }
+
+
+
 
         public String getInsertedTime() {
             return insertedTime;
@@ -171,6 +176,8 @@ public class DailyTask extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_daily_task);
+
+
 
         quotePlace = findViewById(R.id.txt_daily_quote);
 
@@ -274,7 +281,7 @@ public class DailyTask extends AppCompatActivity {
         if (sharedPreferences == null) // Será q é necessário?
                 sharedPreferences = ctx.getSharedPreferences(MainActivity.PREFS_NAME,0);
 
-        // Adcionando o json (lista atual) ao nosso set. Esse set não está persistindo.. (dando reset)
+        // Adcionando o json ao nosso set.
         String listOfTasks = sharedPreferences.getString(MainActivity.LIST_TAG,"");
 
         if (listOfLists == null){listOfLists = new TreeSet<>(); }

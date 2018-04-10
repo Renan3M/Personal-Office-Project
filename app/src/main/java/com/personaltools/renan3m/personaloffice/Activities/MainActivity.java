@@ -287,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskInteraction
         startActivity(new Intent(this, DailyTask.class));
     }
 
-    public void intentConfig(View view) { startActivity(new Intent(this, Configuration.class)); }
+    public void intentConfig(View view) { startActivity(new Intent(this, Ranks.class)); }
 
     public void intentHist(View view) {
         if (DailyTask.getListsFromSharedSet(LIST_OF_LISTS_TAG) == null ||

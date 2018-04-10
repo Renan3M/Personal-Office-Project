@@ -80,7 +80,7 @@ public class Registration extends AppCompatActivity {
         }
 
         _signupButton.setEnabled(false);
-        // ProgressDialog != ProgressBar ... Atenção
+        // ProgressDialog != ProgressBar ... Atenção!!
 
         final ProgressDialog progressDialog =
                 new ProgressDialog(Registration.this, R.style.Theme_AppCompat_DayNight_Dialog);
@@ -135,7 +135,7 @@ public class Registration extends AppCompatActivity {
     }
 
     public void onSignupFailed() {
-        Toast.makeText(getBaseContext(), "Email invalid", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "Field invalid", Toast.LENGTH_LONG).show();
 
         _signupButton.setEnabled(true);
     }

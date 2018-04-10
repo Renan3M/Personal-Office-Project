@@ -16,9 +16,17 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.personaltools.renan3m.personaloffice.Activities.Authentication.Configuration;
 import com.personaltools.renan3m.personaloffice.Activities.DailyTask;
 import com.personaltools.renan3m.personaloffice.Activities.MainActivity;
+import com.personaltools.renan3m.personaloffice.Activities.Ranks;
 import com.personaltools.renan3m.personaloffice.Notification.MyNotificationService;
 import com.personaltools.renan3m.personaloffice.R;
 import com.personaltools.renan3m.personaloffice.Widgets.PomtimeWidget;
@@ -31,8 +39,8 @@ public class CurrentTask extends Fragment {
 
     private final String TAG = "CurrentTask";
 
-    public static final int TIMER_RUNTIME = 1500000; // 25 min
-    //public static final int TIMER_RUNTIME = 20000; // for testing (10s)
+   // public static final int TIMER_RUNTIME = 1500000; // 25 min
+    public static final int TIMER_RUNTIME = 10000; // for testing (10s)
 
     private static final int UPDATE_TIMER = 0;
     private static final int RESET_TIMER = 1;
@@ -40,6 +48,10 @@ public class CurrentTask extends Fragment {
 
     public static int taskCount;
 
+    private static final DatabaseReference mRoot = FirebaseDatabase.getInstance().getReference("pomodors");
+    private static final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+    private int pom;
 
     private OnTaskInteraction mListener;
     private TextView taskName;
@@ -70,6 +82,7 @@ public class CurrentTask extends Fragment {
     private boolean startService;
     private int timeService;
     public static boolean stopThread;
+    private boolean blockUpdate;
 
     public CurrentTask() {
         // Required empty public constructor
@@ -89,6 +102,35 @@ public class CurrentTask extends Fragment {
 
         taskName = view.findViewById(R.id.current_task_name_txt);
         taskName.setText(list.get(0).getNameTask());
+
+
+        final DatabaseReference mUserRoot = mRoot.child(user.getUid()).getRef();
+        // Inclusive persiste offline quando a internet volta // Muito ligado ao onContinue(), não da pra tirar dessa classe...
+        mUserRoot.addValueEventListener(new ValueEventListener() { // Esse método é chamado uma vez ao ser lido e posteriormente na mudança de dados
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if (dataSnapshot.getValue() == null) pom = 0; // Before the node is created for the first time
+                else if (pom == 0) pom = (int) (long) dataSnapshot.getValue(); // Long -> long -> int   // Update pom, when pom is reseated.
+
+                pom++;
+
+                if (blockUpdate == true){
+                Log.e(TAG, "onDataChange: " + dataSnapshot); // Seguro quando chamado apartir da segunda vez
+
+                    sharedPreferences = getActivity().getSharedPreferences(Ranks.RANKS_SHARED, 0);
+                    sharedPreferences.edit().putInt("currentPom", (int)(long)dataSnapshot.getValue()).commit();
+
+
+                blockUpdate = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         btnReseted = false;
 
@@ -119,7 +161,7 @@ public class CurrentTask extends Fragment {
 
 
         uiHandler = new Handler(Looper.getMainLooper()) {
-            @Override
+
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case UPDATE_TIMER:
@@ -168,11 +210,10 @@ public class CurrentTask extends Fragment {
 
         timerThread = new Thread() {
 
-            // A thread tem acesso aos métodos da classe, todavía péssima pratica! (referencia)
-            // Um Assync task ia substituir muito bem a função dessa thread, atualizando a UI sem q eu precise me preocupar com handler.
-            // Futuramente mudar isso pra ser um asynctask
+            // Eu não estou afim de usar AsyncTask (+ fácil), o intuito desse app é muito mais aprendizado do que comercial, então mesmo
+            // perdendo vantagens ligadas a optimização de recursos e um código mais limpo (handlers prontos), farei tudo aqui na mão mesmo.
 
-            @Override
+
             public void run() {
                 synchronized (this) {
                     mActivity = true;
@@ -186,9 +227,9 @@ public class CurrentTask extends Fragment {
 
                     try {
                         while (mActivity && (waited < TIMER_RUNTIME) && !stopThread) {
-                            sleep(1000);
 
                             if (mActivity) {
+
                                 waited += 1000;
 
                                 Message message = new Message();
@@ -199,7 +240,10 @@ public class CurrentTask extends Fragment {
                                 uiHandler.sendMessage(message);
 
                                 updateProgressBar(waited);
+
                             }
+
+                            sleep(1000);
 
                         }
                     } catch (InterruptedException e) {
@@ -255,6 +299,11 @@ public class CurrentTask extends Fragment {
         if (!sharedPreferences.getBoolean(Configuration.SWITCH_STATE_SOUND, false)) mp.start();
 
         list.get(0).decreasePom();
+
+        blockUpdate = true; // It is simply because the method for onDataChange (and I dont know why), it is called once before it changes also.
+
+        mRoot.child(user.getUid()).setValue(pom); // Sets the current pom. (which is added to the previous one)
+
         Log.e(TAG, "decrementado");
 
         Message message = new Message();

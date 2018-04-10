@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/Personal-Office-Project.iml" filepath="$PROJECT_DIR$/.idea/Personal-Office-Project.iml" />
       <module fileurl="file://$PROJECT_DIR$/Personaloffice.iml" filepath="$PROJECT_DIR$/Personaloffice.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
