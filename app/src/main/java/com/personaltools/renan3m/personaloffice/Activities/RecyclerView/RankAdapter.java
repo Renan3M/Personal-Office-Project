@@ -22,9 +22,11 @@ public class RankAdapter extends RecyclerView.Adapter<RankAdapter.RankViewHolder
     private Context mCtx;
 
     private static int positionReq;
+    private static int currentProgress;
+    private int[] values;
 
-    private String rankList[] = {"Campones", "cavaleiro", "nobre", "baronete", "barão", "visconde", "conde",
-            "marquês", "duque", "grão-duque", "principe real", "principe imperial", "regente", "rei", "imperador"};
+    private String rankList[] = {"Camponês", "Cavaleiro", "Nobre", "Baronete", "Barão", "Visconde", "Conde",
+            "Marquês", "Duque", "Grão-duque", "Principe real", "Principe imperial", "Regente", "Rei", "Imperador"};
 
     public RankAdapter(Context mCtx) {
 
@@ -40,8 +42,10 @@ public class RankAdapter extends RecyclerView.Adapter<RankAdapter.RankViewHolder
         return new RankViewHolder(view);
     }
 
-    public void setPosition(int pos){
-        positionReq = pos;  // Position requested by user to be altered.. how do I alter layout structure? I can touch rank_name, etc.. but layout components? <- Não vou precisar fazer isso, graças a Deus! =)
+    public void setData(int pos, int max, int[] values){
+        this.positionReq = pos;  // Position requested by user to be altered.. how do I alter layout structure? I can touch rank_name, etc.. but layout components? <- Não vou precisar fazer isso, graças a Deus! =)
+        this.currentProgress = max;
+        this.values = values;
     }
 
 
@@ -51,17 +55,25 @@ public class RankAdapter extends RecyclerView.Adapter<RankAdapter.RankViewHolder
 
         String rank = rankList[position];
 
-        if (positionReq == position){
+        if (position <= positionReq ){
             holder.rank_name.setText(rank);
-        } else
+            holder.people_at_rank.setText("Parabéns!");
+        } else{
             holder.rank_name.setText("bloqueado");
+            holder.people_at_rank.setText(String.valueOf(values[position]) + " pomodoros para desbloquear!");
+        }
 
-        // Um fake só para teste, o progresso real deve ter os pomodoros totais do rank - os pomodoros feitos como parametro
-        holder.rank_progress.setMax(100);
-        holder.rank_progress.setProgress(50);
+        if (position==0){
+            holder.rank_progress.setMax(1);
+            holder.rank_progress.setProgress(1);
+        }else {
+            holder.rank_progress.setMax(values[position]);
+            holder.rank_progress.setProgress(currentProgress);
+        }
 
         // O progresso real deve verificar no db os usuario que possuem tal rank
-        holder.people_at_rank.setText(position + "000");
+        holder.people_at_rank.setTextSize(12);
+
 
     }
 
