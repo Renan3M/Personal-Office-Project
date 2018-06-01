@@ -7,5 +7,4 @@ It is still being developed, and as the code is open for anyone to see, if you g
 ![alt text](https://raw.githubusercontent.com/Renan3M/Personal-Office-Project/master/app-imgs/img2.png)
 ![alt text](https://raw.githubusercontent.com/Renan3M/Personal-Office-Project/master/app-imgs/img3.png)
 ![alt text](https://raw.githubusercontent.com/Renan3M/Personal-Office-Project/master/app-imgs/img4.png)
-![alt text](https://raw.githubusercontent.com/Renan3M/Personal-Office-Project/master/app-imgs/img5.png)
 ![alt text](https://raw.githubusercontent.com/Renan3M/Personal-Office-Project/master/app-imgs/img6.png)
